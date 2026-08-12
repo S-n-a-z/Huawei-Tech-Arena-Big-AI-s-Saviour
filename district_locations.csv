@@ -1,0 +1,34 @@
+location_id,network,district_id,latitude,longitude,radius_km,location_source,substations_in_area
+sepd_alde,SEPD,ALDE,51.24100097474377,-0.7578579894488454,6.0,operating_area:Aldershot,2809
+sepd_ando,SEPD,ANDO,51.30408678348661,-1.5725021515701887,6.0,operating_area:Andover,1904
+sepd_basi,SEPD,BASI,51.24924856979465,-1.0681695778746003,6.0,operating_area:Basingstoke,2969
+sepd_bour,SEPD,BOUR,50.7562733907041,-1.838733605108358,6.0,operating_area:Bournemouth,2604
+sepd_brac,SEPD,BRAC,51.40622481027261,-0.7433662613466837,6.0,operating_area:Bracknell,2011
+sepd_chic,SEPD,CHIC,50.84299478747278,-0.7973913124671963,6.0,operating_area:Chichester,2852
+sepd_egha,SEPD,EGHA,51.46344473490166,-0.42870294374229434,6.0,operating_area:Egham,1839
+sepd_isle,SEPD,ISLE,50.68908730023202,-1.2759489051282946,6.0,operating_area:Isle Of Wight,1905
+sepd_melk,SEPD,MELK,51.3600446453755,-2.155128557514649,6.0,operating_area:Melksham,4903
+sepd_nats,SEPD,NATS,51.24998654287504,-1.2609944070081207,6.0,network_median_fallback,96256
+sepd_natsl,SEPD,NATSL,51.24998654287504,-1.2609944070081207,6.0,network_median_fallback,96256
+sepd_newb,SEPD,NEWB,51.403632352582086,-1.3207981121790024,6.0,operating_area:Newbury,1894
+sepd_newf,SEPD,NEWF,50.972402450388216,-1.4518918821984514,6.0,operating_area:New Forest,3575
+sepd_oxfn,SEPD,OXFN,51.84667251313343,-1.3035257713899033,6.0,operating_area:Oxford North,3099
+sepd_oxfs,SEPD,OXFS,51.662865058510896,-1.2966945530386846,6.0,operating_area:Oxford South,3168
+sepd_pete,SEPD,PETE,51.04396558923881,-0.7402617642385987,6.0,operating_area:Petersfield,2982
+sepd_pool,SEPD,POOL,50.72834004859363,-2.1513154012398603,6.0,operating_area:Poole,4229
+sepd_port,SEPD,PORT,50.83982272463788,-1.1347132650952623,6.0,operating_area:Portsmouth,2620
+sepd_rean,SEPD,REAN,51.59346820522285,-0.8491619047986634,6.0,operating_area:Reading North,2565
+sepd_reas,SEPD,REAS,51.43791942095685,-0.9859169018390922,6.0,operating_area:Reading South,2714
+sepd_sali,SEPD,SALI,51.06137098993327,-1.8285041625461294,6.0,operating_area:Salisbury,2676
+sepd_slou,SEPD,SLOU,51.52133155828415,-0.6054581677861982,6.0,operating_area:Slough,2595
+sepd_sotn,SEPD,SOTN,50.92341416129426,-1.3731452330836131,6.0,operating_area:Southampton,1965
+sepd_swin,SEPD,SWIN,51.60041700981059,-1.816640514929403,6.0,operating_area:Swindon,3211
+sepd_wlon,SEPD,WLON,51.514709080395725,-0.34530189880045764,6.0,operating_area:West London excl.,2167
+sepd_yeov,SEPD,YEOV,50.9685543640061,-2.4604515224502483,6.0,operating_area:Yeovil,2746
+shepd_argyll,SHEPD,ARGYLL,56.43545335248897,-5.531816835598515,6.0,operating_area:Argyll & West Highl.,9064
+shepd_high,SHEPD,HIGH,57.65475562272339,-4.155874927381408,6.0,operating_area:Highland District,10551
+shepd_n_east,SHEPD,N/EAST,57.39722498864769,-2.4212709775666856,6.0,operating_area:North East District,17964
+shepd_orkn,SHEPD,ORKN,59.01753203437432,-2.986647378592165,6.0,operating_area:Orkney,2592
+shepd_shet,SHEPD,SHET,60.268379232286335,-1.26357260863052,6.0,operating_area:Shetland District,2075
+shepd_taycen,SHEPD,TAYCEN,56.50665202384254,-3.3418971319954527,6.0,operating_area:Tayside and Central,13283
+shepd_wisles,SHEPD,WISLES,57.84408834769124,-6.933552485096519,6.0,operating_area:Western Isles,2456
