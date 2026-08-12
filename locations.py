@@ -8,8 +8,13 @@ from typing import Any
 import pandas as pd
 from pyproj import Transformer
 
-from tech_arena.config import Settings
-from tech_arena.net import download_file, get_json
+try:
+    from tech_arena.config import Settings
+    from tech_arena.net import download_file, get_json
+except ModuleNotFoundError:
+    # Support the small standalone bundle used in the shared repository.
+    from config import Settings
+    from net import download_file, get_json
 
 
 DISTRICT_TO_OPERATING_AREA = {
