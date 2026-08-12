@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import argparse
 import json
 from pathlib import Path
 import re
@@ -8,13 +9,15 @@ from typing import Any
 import pandas as pd
 from pyproj import Transformer
 
-try:
-    from tech_arena.config import Settings
-    from tech_arena.net import download_file, get_json
-except ModuleNotFoundError:
-    # Support the small standalone bundle used in the shared repository.
-    from config import Settings
-    from net import download_file, get_json
+from net import download_file, get_json
+
+
+PACKAGE_API = "https://data-api.ssen.co.uk/api/3/action/package_show?id=ssen-substation-data"
+CSV_RESOURCE_ID = "336d9720-353c-49d3-8415-11e1cf4a85b9"
+SOURCE_CRS = "EPSG:27700"
+TARGET_CRS = "EPSG:4326"
+DEFAULT_RAW_PATH = Path("data/raw/ssen/substations.csv")
+DEFAULT_INCIDENTS_PATH = Path("data/interim/nafirs_incidents.csv.gz")
 
 
 DISTRICT_TO_OPERATING_AREA = {
@@ -56,74 +59,157 @@ DISTRICT_TO_OPERATING_AREA = {
 }
 
 
-def download_substations(settings: Settings, force: bool = False) -> Path:
-    config = settings.values["substations"]
-    payload = get_json(config["package_api"])
-    wanted = config["csv_resource_id"]
+def download_substations(force: bool = False) -> Path:
+    payload = get_json(PACKAGE_API)
     resource = next(
-        (item for item in payload["result"]["resources"] if item.get("id") == wanted),
+        (item for item in payload["result"]["resources"] if item.get("id") == CSV_RESOURCE_ID),
         None,
     )
     if resource is None:
         raise RuntimeError("SSEN substation CSV resource was not found in the package metadata.")
-    output = settings.path("raw_dir") / "ssen" / "substations.csv"
-    record = download_file(resource["url"], output, force=force)
+
+    record = download_file(resource["url"], DEFAULT_RAW_PATH, force=force)
     record.update(
         {
-            "resource_id": wanted,
-            "license": payload["result"].get("license_title", "Creative Commons Attribution 4.0"),
+            "resource_id": CSV_RESOURCE_ID,
+            "license": payload["result"].get(
+                "license_title", "Creative Commons Attribution 4.0"
+            ),
             "license_url": payload["result"].get("license_url"),
         }
     )
-    (output.parent / "manifest.json").write_text(json.dumps(record, indent=2), encoding="utf-8")
-    return output
+    manifest = DEFAULT_RAW_PATH.parent / "manifest.json"
+    manifest.write_text(json.dumps(record, indent=2), encoding="utf-8")
+    return DEFAULT_RAW_PATH
 
 
 def _slug(value: str) -> str:
     return re.sub(r"[^a-z0-9]+", "_", value.lower()).strip("_")
 
 
-def derive_district_locations(settings: Settings, force_download: bool = False) -> Path:
-    source = download_substations(settings, force=force_download)
-    substations = pd.read_csv(
-        source,
-        usecols=["owner_name", "operating_area", "location_x_m", "location_y_m"],
-        low_memory=False,
-    )
-    substations["owner_name"] = substations["owner_name"].astype(str).str.upper()
-    substations["operating_area"] = substations["operating_area"].astype(str).str.strip()
+def _read_substations(source: Path) -> pd.DataFrame:
+    substations = pd.read_csv(source, low_memory=False)
+    substations.columns = [str(column).strip().lower() for column in substations.columns]
+    substations["owner_name"] = substations["owner_name"].astype("string").str.upper().str.strip()
+    substations["operating_area"] = substations["operating_area"].astype("string").str.strip()
     substations["location_x_m"] = pd.to_numeric(substations["location_x_m"], errors="coerce")
     substations["location_y_m"] = pd.to_numeric(substations["location_y_m"], errors="coerce")
-    substations = substations.dropna(subset=["location_x_m", "location_y_m"])
-    substations = substations.drop_duplicates(
-        ["owner_name", "operating_area", "location_x_m", "location_y_m"]
-    )
+    return substations.dropna(subset=["location_x_m", "location_y_m"]).copy()
 
+
+def export_substation_coordinates(
+    source: Path,
+    output: Path = Path("ssen_individual_substation_coordinates.csv"),
+) -> Path:
+    """Write one WGS84 row per unique SSEN physical coordinate."""
+    substations = _read_substations(source)
+    substations["easting_m"] = substations["location_x_m"].round(3)
+    substations["northing_m"] = substations["location_y_m"].round(3)
+    key_columns = ["owner_name", "easting_m", "northing_m"]
+    substations["source_record_count"] = substations.groupby(key_columns)[
+        "owner_name"
+    ].transform("size")
+
+    metadata_columns = [
+        "type",
+        "class",
+        "number",
+        "status",
+        "data_confidence",
+        "fence_type",
+        "operating_area",
+        "locality",
+    ]
+    substations["metadata_completeness"] = substations[metadata_columns].notna().sum(axis=1)
+    substations = substations.sort_values(
+        key_columns + ["metadata_completeness"],
+        ascending=[True, True, True, False],
+        kind="stable",
+    ).drop_duplicates(key_columns, keep="first")
+
+    transformer = Transformer.from_crs(SOURCE_CRS, TARGET_CRS, always_xy=True)
+    longitude, latitude = transformer.transform(
+        substations["easting_m"].to_numpy(),
+        substations["northing_m"].to_numpy(),
+    )
+    substations["latitude"] = latitude
+    substations["longitude"] = longitude
+    substations["substation_id"] = (
+        substations["owner_name"]
+        + "_"
+        + (substations["easting_m"] * 1000).round().astype("int64").astype(str)
+        + "_"
+        + (substations["northing_m"] * 1000).round().astype("int64").astype(str)
+    )
+    result = substations.rename(columns={"owner_name": "network"})[
+        [
+            "substation_id",
+            "network",
+            "type",
+            "class",
+            "number",
+            "status",
+            "data_confidence",
+            "fence_type",
+            "operating_area",
+            "locality",
+            "latitude",
+            "longitude",
+            "easting_m",
+            "northing_m",
+            "source_record_count",
+        ]
+    ].sort_values(["network", "substation_id"])
+    output.parent.mkdir(parents=True, exist_ok=True)
+    result.to_csv(output, index=False, float_format="%.8f")
+    return output
+
+
+def derive_district_locations(
+    source: Path,
+    incidents_path: Path = DEFAULT_INCIDENTS_PATH,
+    output: Path = Path("district_locations.csv"),
+    excluded_output: Path = Path("excluded_unmatched_districts.csv"),
+) -> Path:
+    substations = _read_substations(source)[
+        ["owner_name", "operating_area", "location_x_m", "location_y_m"]
+    ].drop_duplicates(["owner_name", "operating_area", "location_x_m", "location_y_m"])
     incidents = pd.read_csv(
-        settings.path("interim_dir") / "nafirs_incidents.csv.gz",
+        incidents_path,
         usecols=["NETWORK", "DISTRICT_ID"],
         low_memory=False,
     ).drop_duplicates()
-    transformer = Transformer.from_crs(
-        settings.values["substations"]["source_crs"],
-        settings.values["substations"]["target_crs"],
-        always_xy=True,
-    )
+    transformer = Transformer.from_crs(SOURCE_CRS, TARGET_CRS, always_xy=True)
+
     rows: list[dict[str, Any]] = []
+    excluded_rows: list[dict[str, str]] = []
     for item in incidents.itertuples(index=False):
         network, district = str(item.NETWORK), str(item.DISTRICT_ID)
         operating_area = DISTRICT_TO_OPERATING_AREA.get(network, {}).get(district)
-        network_points = substations.loc[substations["owner_name"] == network]
-        district_points = (
-            network_points.loc[network_points["operating_area"].str.casefold() == operating_area.casefold()]
-            if operating_area
-            else pd.DataFrame()
-        )
+        if operating_area is None:
+            excluded_rows.append(
+                {
+                    "network": network,
+                    "district_id": district,
+                    "reason": "no_operating_area_mapping",
+                }
+            )
+            continue
+
+        district_points = substations.loc[
+            (substations["owner_name"] == network)
+            & (substations["operating_area"].str.casefold() == operating_area.casefold())
+        ]
         if district_points.empty:
-            district_points = network_points
-            source_label = "network_median_fallback"
-        else:
-            source_label = f"operating_area:{operating_area}"
+            excluded_rows.append(
+                {
+                    "network": network,
+                    "district_id": district,
+                    "reason": f"no_substations_for_operating_area:{operating_area}",
+                }
+            )
+            continue
+
         x = float(district_points["location_x_m"].median())
         y = float(district_points["location_y_m"].median())
         longitude, latitude = transformer.transform(x, y)
@@ -135,18 +221,50 @@ def derive_district_locations(settings: Settings, force_download: bool = False) 
                 "latitude": latitude,
                 "longitude": longitude,
                 "radius_km": 6.0,
-                "location_source": source_label,
+                "location_source": f"operating_area:{operating_area}",
                 "substations_in_area": int(len(district_points)),
             }
         )
-    result = pd.DataFrame(rows).sort_values(["network", "district_id"])
-    output = settings.path("interim_dir") / "district_locations.csv"
-    result.to_csv(output, index=False)
+
+    output.parent.mkdir(parents=True, exist_ok=True)
+    pd.DataFrame(rows).sort_values(["network", "district_id"]).to_csv(output, index=False)
+    pd.DataFrame(
+        excluded_rows,
+        columns=["network", "district_id", "reason"],
+    ).sort_values(["network", "district_id"]).to_csv(excluded_output, index=False)
     return output
 
 
-def configured_locations(settings: Settings) -> list[dict[str, Any]]:
-    path = settings.path("interim_dir") / "district_locations.csv"
-    if path.exists():
-        return pd.read_csv(path).to_dict(orient="records")
-    return list(settings.values["weather"]["locations"])
+def build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(description="Prepare SSEN location data for Topic Two")
+    parser.add_argument(
+        "command",
+        choices=("export-substations", "prepare-locations", "all"),
+        nargs="?",
+        default="export-substations",
+    )
+    parser.add_argument("--source", type=Path, help="Use an existing SSEN substation CSV")
+    parser.add_argument("--incidents", type=Path, default=DEFAULT_INCIDENTS_PATH)
+    parser.add_argument("--force-download", action="store_true")
+    return parser
+
+
+def main() -> None:
+    args = build_parser().parse_args()
+    source = args.source or download_substations(force=args.force_download)
+    completed: list[Path] = []
+    if args.command in {"export-substations", "all"}:
+        completed.append(export_substation_coordinates(source))
+    if args.command in {"prepare-locations", "all"}:
+        if not args.incidents.exists():
+            raise FileNotFoundError(
+                f"NaFIRS incident file not found: {args.incidents}. "
+                "Pass its path with --incidents."
+            )
+        completed.append(derive_district_locations(source, incidents_path=args.incidents))
+    for path in completed:
+        print(path.resolve())
+
+
+if __name__ == "__main__":
+    main()
