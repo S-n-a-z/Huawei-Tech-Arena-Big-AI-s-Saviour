@@ -32,4 +32,4 @@ District representatives need the normalized NaFIRS incident file as well:
 python locations.py prepare-locations --incidents path/to/nafirs_incidents.csv.gz
 ```
 
-That command also writes `excluded_unmatched_districts.csv`. At the moment NATS and NATSL are excluded because we do not have a defensible SSEN operating-area match for them.
+That command also writes `excluded_unmatched_districts.csv`. At the moment NATS and NATSL are excluded because we do not have a operating-area match for them.
