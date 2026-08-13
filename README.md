@@ -9,5 +9,18 @@ This repo holds the work for our Topic Two model.
 - `district_locations.csv` contains the 31 district representatives that could be matched to an SSEN operating area.
 - `excluded_unmatched_districts.csv` records NATS and NATSL as excluded because there is no supported operating-area match. We do not assign them the median of the whole network.
 - `LOCATION_SETUP.md` has the commands needed to reproduce the files.
+- `plot_district_substation_map.py` creates an interactive map of the district representative points and substations.
 
 The 6 km value in the district file is a working midpoint within Huawei's stated 3–9 km weather radius. It is not a prescribed value. The individual substation CSV contains point coordinates and does not use that radius.
+
+## Interactive map
+
+`plot_district_substation_map.py` creates an interactive map of district representative points and substations.
+
+```bash
+python -m pip install -r requirements.txt
+python plot_district_substation_map.py
+```
+When `Map saved to district_substation_map.html` appears in the terminal, open `district_substation_map.html` in a browser.
+
+Hover over a district to highlight its associated substations. The 3/6/9 km radius layers can also be switched on and off.
