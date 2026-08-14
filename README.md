@@ -25,7 +25,7 @@ When `Map saved to district_substation_map.html` appears in the terminal, open `
 
 Hover over a district to highlight its associated substations. The 3/6/9 km radius layers can also be switched on and off.
 
-##NaFIRS LV Faults
+## NaFIRS LV Faults
 
 `python -c "from nafirs import NaFIRSLoader; loader = NaFIRSLoader(); incidents = loader.load(); print(f'Loaded {len(incidents)} incidents'); print(incidents.head())"` Load and explore data:
 
