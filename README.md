@@ -24,3 +24,12 @@ python plot_district_substation_map.py
 When `Map saved to district_substation_map.html` appears in the terminal, open `district_substation_map.html` in a browser.
 
 Hover over a district to highlight its associated substations. The 3/6/9 km radius layers can also be switched on and off.
+
+## NaFIRS LV Faults
+
+`python -c "from nafirs import NaFIRSLoader; loader = NaFIRSLoader(); incidents = loader.load(); print(f'Loaded {len(incidents)} incidents'); print(incidents.head())"` Load and explore data:
+
+`python -c "from nafirs import NaFIRSLoader, NaFIRSProcessor; loader = NaFIRSLoader(); processor = NaFIRSProcessor(loader.load()); print(processor.regional_outage_proportion('D').head())"` Get regional outage proportion
+
+`python -c "from nafirs import NaFIRSLoader, NaFIRSProcessor, NaFIRSFeatureEngine; loader = NaFIRSLoader(); processor = NaFIRSProcessor(loader.load()); engine = NaFIRSFeatureEngine(processor); print(engine.create_district_features().head())"` Extract district features:
+
