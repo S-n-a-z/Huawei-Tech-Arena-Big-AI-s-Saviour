@@ -113,10 +113,17 @@ class NaFIRSLoader:
     def _get_network_from_district(district_code: str) -> str:
         """Map SHEPD/SEPD district codes to network names."""
         district_to_network = {
-            # SHEPD districts
+            # SHEPD districts (7 total)
             "HIGH": "SHEPD", "ARGYLL": "SHEPD", "N/EAST": "SHEPD",
             "ORKN": "SHEPD", "SHET": "SHEPD", "TAYCEN": "SHEPD", "WISLES": "SHEPD",
-            # Add SEPD districts as they appear
+            # SEPD districts (26 total)
+            "ALDE": "SEPD", "ANDO": "SEPD", "BASI": "SEPD", "BOUR": "SEPD",
+            "BRAC": "SEPD", "CHIC": "SEPD", "EGHA": "SEPD", "ISLE": "SEPD",
+            "MELK": "SEPD", "NATS": "SEPD", "NATSL": "SEPD", "NEWB": "SEPD",
+            "NEWF": "SEPD", "OXFN": "SEPD", "OXFS": "SEPD", "PETE": "SEPD",
+            "POOL": "SEPD", "PORT": "SEPD", "REAN": "SEPD", "REAS": "SEPD",
+            "SALI": "SEPD", "SLOU": "SEPD", "SOTN": "SEPD", "SWIN": "SEPD",
+            "WLON": "SEPD", "YEOV": "SEPD",
         }
         return district_to_network.get(str(district_code), "UNKNOWN")
 
