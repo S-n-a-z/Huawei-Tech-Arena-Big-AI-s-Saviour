@@ -1,0 +1,4 @@
+data/processed/district_weather_hourly.csv.gz filter=lfs diff=lfs merge=lfs -text
+data/processed/district_weather_hourly_yearly/*.csv.gz filter=lfs diff=lfs merge=lfs -text
+data/raw/weather_grids/*.gz filter=lfs diff=lfs merge=lfs -text
+data/raw/weather_grids/**/*.gz filter=lfs diff=lfs merge=lfs -text

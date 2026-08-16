@@ -1,0 +1,3 @@
+variable,mean_spread,p95_spread,p99_spread,max_spread
+temperature_2m,0.9378626056899213,2.0999999999999996,3.1000000000000005,10.9
+relative_humidity_2m,4.158548464714832,10.0,17.0,57.0

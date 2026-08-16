@@ -1,0 +1,11 @@
+check,violations
+humidity_mean < 0,0
+humidity_mean > 100,0
+precipitation_mean < 0,0
+precipitation_max < 0,0
+rain_mean < 0,0
+snowfall_mean < 0,0
+snow_depth_mean < 0,0
+wind_speed_mean < 0,0
+wind_gust_mean < 0,0
+surface_pressure_mean <= 0,0

@@ -33,3 +33,33 @@ Hover over a district to highlight its associated substations. The 3/6/9 km radi
 
 `python -c "from nafirs import NaFIRSLoader, NaFIRSProcessor, NaFIRSFeatureEngine; loader = NaFIRSLoader(); processor = NaFIRSProcessor(loader.load()); engine = NaFIRSFeatureEngine(processor); print(engine.create_district_features().head())"` Extract district features:
 
+## Weather Data
+
+The weather pipeline converts Open-Meteo weather data into hourly district-level weather data for the 31 supported SEPD and SHEPD districts. Each district uses 17 spatial sampling locations within the selected 9 km sampling scheme. Sampling locations are mapped to the actual Open-Meteo weather grids, shared grids are downloaded only once, and the grid values are aggregated back to district level.
+
+- `data/processed/district_weather_hourly.csv.gz` is the main weather dataset for downstream use. It contains 3,092,064 district-hour records, 34 columns, 31 districts, and hourly data from `2015-03-28 00:00:00` to `2026-08-12 23:00:00` UTC. There are no duplicate district-hours or missing values.
+
+- `data/processed/district_weather_hourly_yearly/` contains the same district-level weather data split into yearly compressed CSV files from 2015 to 2026 for easier loading.
+
+- `district_weather_grid_mapping.csv` records how the 17 sampling locations for each district map to the actual Open-Meteo weather grids used for district aggregation.
+
+- `weather_unique_grids.csv` contains the 159 unique Open-Meteo grids used by all districts after shared grids are deduplicated.
+
+- `data/raw/weather_grids/` contains the downloaded hourly weather data for the 159 unique Open-Meteo grids.
+
+- `data/processed/weather_validation/` contains district-level quality-control reports covering row counts, spatial metadata, physical sanity checks, variable distributions, spatial spread, and extreme weather observations.
+
+- `data/raw/weather_grid_validation_report.csv` contains the raw-grid validation results. All 159 grids passed validation with no duplicate timestamps, missing hours, missing values, or coordinate errors.
+
+- `build_district_weather_hourly.py` builds the final district-level hourly weather dataset from the downloaded grid data and the district-to-grid mapping.
+
+- `validate_weather_grids.py` validates the raw Open-Meteo grid data for completeness, hourly continuity, duplicate timestamps, missing values, and coordinate consistency.
+
+- `validate_district_weather.py` validates the final district-level weather dataset for structural consistency and basic physical sanity.
+
+The main dataset includes temperature, relative humidity, dew point, precipitation, rain, snowfall, snow depth, soil moisture, wind speed, wind gusts, surface pressure, wind direction, weather code, and spatial sampling metadata. Continuous weather variables are represented using appropriate district-level spatial statistics such as mean, minimum, and maximum.
+
+For downstream work, use `data/processed/district_weather_hourly.csv.gz` as the primary weather input. 
+
+The compressed weather datasets are stored with Git LFS because of their file size. Install Git LFS before cloning or pulling the repository (`git lfs install`) so the full weather data files are downloaded correctly.
+
