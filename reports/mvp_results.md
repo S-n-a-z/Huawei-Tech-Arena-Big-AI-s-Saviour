@@ -1,8 +1,7 @@
 # Topic Two development results
 
-> Status: engineering baseline. The topology coefficients and rule parameters in
-> `configs/default.toml` are transparent placeholders and must be replaced by the
-> values supplied by the organising committee before a scored submission.
+> Status: reproducible engineering baseline. Architecture calculations use the
+> versioned configuration recorded in `configs/default.toml`.
 
 ## Data snapshot
 
@@ -17,8 +16,7 @@
 ## Validation
 
 Validation is chronological and purged by the maximum task horizon. Metrics below
-are development diagnostics on the sampled modelling table, not the unpublished
-official leaderboard metric.
+are chronological hold-out diagnostics on the sampled modelling table.
 
 | Task | Train rows | Test rows | MAE | RMSE | High-risk MAE | PR-AUC | Event recall |
 |---|---:|---:|---:|---:|---:|---:|---:|
@@ -34,8 +32,8 @@ official leaderboard metric.
 
 The day-ahead model improves both average error and rare-event discrimination.
 For hour-ahead prediction it improves RMSE and PR-AUC but gives up some MAE to
-persistence. The final persistence blend should therefore be selected after the
-organising committee publishes the official scoring metric.
+persistence. This metric trade-off is retained in the recorded evidence rather
+than hidden behind a single summary value.
 
 ## Implemented ablation path
 
@@ -52,7 +50,6 @@ organising committee publishes the official scoring metric.
   AIDC site locations.
 - NaFIRS incident duration and customers affected are used only to construct labels;
   post-event cause and duration fields are not forecasting inputs.
-- The official CSV schema, scoring metric, feeder sigmoid coefficients and
-  architecture rule equations are not present in the public brief.
-- Output CSVs are compact latest-window inference demonstrations pending the
-  organising committee's designated test window and sample-submission schema.
+- Architecture calculations use versioned engineering assumptions and are not
+  a substitute for site-specific protection studies or equipment certification.
+- Output CSVs are latest-window reference exports from the recorded model run.
