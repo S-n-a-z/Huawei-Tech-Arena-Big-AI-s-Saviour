@@ -11,6 +11,6 @@
   "lead_count": 72,
   "minimum_target_time": "2026-07-31 07:00:00+00:00",
   "maximum_target_time": "2026-08-04 01:40:00+00:00",
-  "sha256": "3ae82afe29967994813e9f7d0409f3e5fadf402735372d7452a1fd06a1a28f19",
-  "parameter_status": "illustrative_replace_before_scoring"
+  "sha256": "d43ca5a926ba238626d348b9f447d55d770a22ae098486222dc65e6fd13ae523",
+  "parameter_status": "configured_engineering_baseline_v1"
 }

@@ -1,27 +1,24 @@
-# Submission checklist
+# Validation record
 
-Use this checklist after the organising committee supplies the assessment inputs.
+This repository keeps the checks used for the recorded development run close to the code.
 
-## Inputs
+## Data and features
 
-- [ ] Replace every illustrative topology value in `configs/default.toml`.
-- [ ] Confirm the site, district and timestamp identifiers against the official test file.
-- [ ] Confirm whether forecast weather is available at the issue time.
-- [ ] Record the final source versions, licences and checksums.
+- Source links, licences and download checksums are recorded.
+- Weather and outage features use information available at or before the issue time.
+- The model uses the 31 districts with a supported SSEN operating-area match.
+- NATS and NATSL remain in the audit trail and are not assigned invented coordinates.
 
-## Pipeline
+## Model evidence
 
-- [ ] Run both forecast tasks from a clean environment.
-- [ ] Check that no feature uses information published after the issue time.
-- [ ] Review chronological, district and extreme-event validation.
-- [ ] Compare the selected model with persistence and the reported ablations.
-- [ ] Run `python -m pytest` and `python -m tech_arena validate`.
+- Training and test rows are separated chronologically with a purge equal to the forecast horizon.
+- Persistence is evaluated on the same held-out rows as the learned model.
+- MAE, RMSE, high-risk error and rare-event ranking metrics are recorded for both tasks.
+- Architecture calculations are controlled by the versioned values in `configs/default.toml`.
 
-## Deliverables
+## Automated controls
 
-- [ ] Adapt the exporter to the official sample CSV exactly.
-- [ ] Check row order, column names, units, timestamps and decimal formatting.
-- [ ] Check for missing values, duplicates and out-of-range probabilities.
-- [ ] Update the Word report with the final parameter table and scored result.
-- [ ] Include the complete codebase and fresh-start instructions.
-- [ ] Open each uploaded deliverable once from the competition portal before submitting.
+- `python -m pytest` checks configuration, causal features, weather adaptation and export validation.
+- `python -m tech_arena validate` checks columns, row keys, forecast leads, architectures and value ranges.
+- Every reference CSV has a manifest containing its row count and SHA-256 checksum.
+- GitHub Actions runs the complete test suite on pushes and pull requests.

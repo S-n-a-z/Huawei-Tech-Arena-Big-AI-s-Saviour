@@ -17,7 +17,7 @@ Rows are split chronologically. The maximum forecast horizon is purged between t
 - NaFIRS does not include total customers served by district, so severity uses a documented exposure proxy.
 - Hour-ahead weather is based on the latest available hourly observation and is forward-filled to five-minute steps.
 - District coordinates represent SSEN operating areas rather than confirmed data-centre sites.
-- The committed topology coefficients are illustrative until the assessed configuration is supplied.
+- The topology coefficients are versioned engineering assumptions rather than site-specific certification values.
 - Validation covers SSEN licence areas and should not be read as evidence of performance in other countries or network operators.
 
 ## Responsible use
