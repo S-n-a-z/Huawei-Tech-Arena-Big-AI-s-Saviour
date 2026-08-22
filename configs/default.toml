@@ -1,0 +1,146 @@
+[project]
+random_seed = 2026
+
+[paths]
+raw_dir = "data/raw"
+interim_dir = "data/interim"
+processed_dir = "data/processed"
+artifact_dir = "artifacts"
+output_dir = "outputs"
+
+[nafirs]
+package_api = "https://data-api.ssen.co.uk/api/3/action/package_show?id=nafirs-lv-faults"
+sepd_resource_id = "743effda-bbff-4930-bdba-40eb63f97f65"
+shepd_resource_id = "932fbadb-5e87-4bb7-bf5c-c8b75c2f3cf2"
+timezone = "Europe/London"
+
+[substations]
+package_api = "https://data-api.ssen.co.uk/api/3/action/package_show?id=ssen-substation-data"
+csv_resource_id = "336d9720-353c-49d3-8415-11e1cf4a85b9"
+source_crs = "EPSG:27700"
+target_crs = "EPSG:4326"
+
+[weather]
+archive_api = "https://archive-api.open-meteo.com/v1/archive"
+forecast_api = "https://api.open-meteo.com/v1/forecast"
+timezone = "UTC"
+variables = [
+  "temperature_2m",
+  "relative_humidity_2m",
+  "dew_point_2m",
+  "precipitation",
+  "rain",
+  "snowfall",
+  "surface_pressure",
+  "wind_speed_10m",
+  "wind_direction_10m",
+  "wind_gusts_10m",
+  "soil_moisture_0_to_7cm",
+]
+
+# These transparent regional anchors are fallbacks. The normal pipeline derives
+# district-level centroids from SSEN's official substation-location dataset.
+[[weather.locations]]
+location_id = "sepd_west"
+network = "SEPD"
+latitude = 51.2665
+longitude = -1.0870
+radius_km = 6
+
+[[weather.locations]]
+location_id = "sepd_central"
+network = "SEPD"
+latitude = 51.4543
+longitude = -0.9781
+radius_km = 6
+
+[[weather.locations]]
+location_id = "sepd_coast"
+network = "SEPD"
+latitude = 50.8198
+longitude = -1.0880
+radius_km = 6
+
+[[weather.locations]]
+location_id = "shepd_north"
+network = "SHEPD"
+latitude = 57.4778
+longitude = -4.2247
+radius_km = 6
+
+[[weather.locations]]
+location_id = "shepd_east"
+network = "SHEPD"
+latitude = 57.1497
+longitude = -2.0943
+radius_km = 6
+
+[[weather.locations]]
+location_id = "shepd_islands"
+network = "SHEPD"
+latitude = 58.9847
+longitude = -2.9587
+radius_km = 6
+
+[features]
+hourly_history_days = 730
+five_minute_history_days = 120
+negative_to_positive_ratio = 5
+day_max_positive_per_district_horizon = 100
+hour_max_positive_per_district_horizon = 50
+minimum_negative_per_district_horizon = 100
+day_ahead_horizons_hours = [1, 6, 12, 24, 36, 48]
+hour_ahead_horizons_minutes = [5, 15, 30, 60, 180, 360]
+
+[model]
+event_threshold = 0.001
+test_fraction = 0.2
+classifier_max_iter = 150
+regressor_max_iter = 180
+learning_rate = 0.06
+max_leaf_nodes = 31
+min_samples_leaf = 20
+
+[resilience]
+default_critical_load_kw = 1000.0
+parameter_status = "illustrative_replace_before_scoring"
+
+[[resilience.topologies]]
+topology_id = "ups_2n"
+display_name = "IT Power 2N + UPS 2N"
+k = 12.0
+x0 = 0.20
+redundancy_factor = 2.0
+usable_energy_kwh = 1000.0
+generator_hours = 8.0
+coverage_cap = 1.0
+
+[[resilience.topologies]]
+topology_id = "ups_dr"
+display_name = "IT Power 2N + UPS Distributed Redundancy"
+k = 11.0
+x0 = 0.18
+redundancy_factor = 1.5
+usable_energy_kwh = 750.0
+generator_hours = 6.0
+coverage_cap = 1.0
+
+[[resilience.topologies]]
+topology_id = "hvdc_2n"
+display_name = "IT Power 2N + HVDC 2N"
+k = 12.5
+x0 = 0.22
+redundancy_factor = 2.0
+usable_energy_kwh = 900.0
+generator_hours = 8.0
+coverage_cap = 1.0
+
+[[resilience.topologies]]
+topology_id = "mains_2n"
+display_name = "IT Power 2N + Direct Utility 2N"
+k = 10.0
+x0 = 0.15
+redundancy_factor = 2.0
+usable_energy_kwh = 50.0
+generator_hours = 0.0
+coverage_cap = 1.0
