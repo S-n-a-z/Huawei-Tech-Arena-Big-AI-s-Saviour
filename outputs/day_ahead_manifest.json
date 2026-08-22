@@ -1,0 +1,16 @@
+{
+  "task": "day_ahead",
+  "rows": 5952,
+  "districts": 31,
+  "architectures": [
+    "hvdc_2n",
+    "mains_2n",
+    "ups_2n",
+    "ups_dr"
+  ],
+  "lead_count": 48,
+  "minimum_target_time": "2026-07-26 00:00:00+00:00",
+  "maximum_target_time": "2026-08-04 02:00:00+00:00",
+  "sha256": "f495fea652030522916964c5cc9953612337b8cac7c3108e9186f27bc51dd5d0",
+  "parameter_status": "illustrative_replace_before_scoring"
+}

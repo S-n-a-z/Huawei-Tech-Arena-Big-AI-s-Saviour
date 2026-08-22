@@ -1,65 +1,105 @@
-# Huawei Tech Arena Topic Two — location data
+# Huawei Tech Arena 2026 - Topic Two
 
-This repo holds the work for our Topic Two model.
+This repository contains our work on predicting the continuity of power supplied to AI data centres during severe weather. It brings together the team's location, outage and weather preparation with a reproducible forecasting pipeline and a transparent power-architecture layer.
 
-## Included files
+The statistical model estimates district-level grid risk. A separate engineering calculation then applies the four architecture configurations described in the challenge. Keeping these stages separate makes the assumptions easy to inspect and lets us replace the final Huawei parameters without retraining the regional model.
 
-- `locations.py` downloads the official SSEN substation source, removes repeated physical locations and converts British National Grid coordinates to WGS84 latitude/longitude.
-- `ssen_individual_substation_coordinates.csv` contains 124,950 unique locations. `source_record_count` shows how many original records shared each physical point.
-- `district_locations.csv` contains the 31 district representatives that could be matched to an SSEN operating area.
-- `excluded_unmatched_districts.csv` records NATS and NATSL as excluded because there is no supported operating-area match. We do not assign them the median of the whole network.
-- `LOCATION_SETUP.md` has the commands needed to reproduce the files.
-- `plot_district_substation_map.py` creates an interactive map of the district representative points and substations.
+## What is included
 
-The 6 km value in the district file is a working midpoint within Huawei's stated 3–9 km weather radius. It is not a prescribed value. The individual substation CSV contains point coordinates and does not use that radius.
+- SSEN substation locations converted from British National Grid coordinates to WGS84.
+- NaFIRS low-voltage incident preparation for the SEPD and SHEPD licence areas.
+- District-level Open-Meteo history, with spatial sampling and validation reports.
+- Causal risk, weather and seasonal features for both forecast horizons.
+- Chronologically purged validation and a persistence baseline.
+- A two-stage model for rare outage events and conditional severity.
+- Configurable calculations for UPS 2N, distributed redundancy, HVDC 2N and direct utility 2N.
+- Optional OpenStreetMap infrastructure features.
+- Automated tests, output validation, prediction manifests and a technical report draft.
 
-## Interactive map
+## Current evidence
 
-`plot_district_substation_map.py` creates an interactive map of district representative points and substations.
+The recorded development run begins with 220,715 NaFIRS incidents across 33 district codes. The model uses the 31 districts with a supported SSEN operating-area match; NATS and NATSL remain in the audit file but are not silently assigned invented coordinates. On the held-out period, the day-ahead model improves MAE from 0.03457 to 0.02871 and PR-AUC from 0.18897 to 0.30313. The hour-ahead model improves RMSE from 0.09827 to 0.07908 and PR-AUC from 0.42455 to 0.63017, although persistence remains better on MAE. Full figures and limitations are in `reports/mvp_results.md`.
 
-```bash
-python -m pip install -r requirements.txt
-python plot_district_substation_map.py
+## Important final-input note
+
+The architecture coefficients in `configs/default.toml` are marked as illustrative engineering defaults. They must be replaced by the topology type, sigmoid coefficients, load, storage and generator parameters supplied for the assessed test case. The public brief does not include the final scoring metric or sample-submission schema, so the output adapter is kept in `src/tech_arena/resilience.py` and can be changed without retraining.
+
+## Set-up on Windows PowerShell
+
+```powershell
+py -3.12 -m venv .venv
+.\.venv\Scripts\python.exe -m pip install --upgrade pip
+.\.venv\Scripts\python.exe -m pip install -e ".[dev]"
 ```
-When `Map saved to district_substation_map.html` appears in the terminal, open `district_substation_map.html` in a browser.
 
-Hover over a district to highlight its associated substations. The 3/6/9 km radius layers can also be switched on and off.
+For the exact environment used for the recorded results:
 
-## NaFIRS LV Faults
+```powershell
+.\.venv\Scripts\python.exe -m pip install -r requirements-lock.txt
+.\.venv\Scripts\python.exe -m pip install -e . --no-deps
+```
 
-`python -c "from nafirs import NaFIRSLoader; loader = NaFIRSLoader(); incidents = loader.load(); print(f'Loaded {len(incidents)} incidents'); print(incidents.head())"` Load and explore data:
+## Run the complete pipeline
 
-`python -c "from nafirs import NaFIRSLoader, NaFIRSProcessor; loader = NaFIRSLoader(); processor = NaFIRSProcessor(loader.load()); print(processor.regional_outage_proportion('D').head())"` Get regional outage proportion
+```powershell
+.\.venv\Scripts\python.exe -m tech_arena run-all
+```
 
-`python -c "from nafirs import NaFIRSLoader, NaFIRSProcessor, NaFIRSFeatureEngine; loader = NaFIRSLoader(); processor = NaFIRSProcessor(loader.load()); engine = NaFIRSFeatureEngine(processor); print(engine.create_district_features().head())"` Extract district features:
+This performs data acquisition, normalisation, weather download, both feature builds, both training runs, prediction export, validation and results-summary generation. Raw third-party data stay under `data/raw/` and are ignored by Git.
 
-## Weather Data
+Optional OSM augmentation:
 
-The weather pipeline converts Open-Meteo weather data into hourly district-level weather data for the 31 supported SEPD and SHEPD districts. Each district uses 17 spatial sampling locations within the selected 9 km sampling scheme. Sampling locations are mapped to the actual Open-Meteo weather grids, shared grids are downloaded only once, and the grid values are aggregated back to district level.
+```powershell
+.\.venv\Scripts\python.exe -m tech_arena download-osm
+.\.venv\Scripts\python.exe -m tech_arena build-features --include-osm
+.\.venv\Scripts\python.exe -m tech_arena train
+```
 
-- `data/processed/district_weather_hourly.csv.gz` is the main weather dataset for downstream use. It contains 3,092,064 district-hour records, 34 columns, 31 districts, and hourly data from `2015-03-28 00:00:00` to `2026-08-12 23:00:00` UTC. There are no duplicate district-hours or missing values.
+If public Overpass instances are throttled, preserve the completed cache and build a feature table with explicit missingness instead of retrying aggressively:
 
-- `data/processed/district_weather_hourly_yearly/` contains the same district-level weather data split into yearly compressed CSV files from 2015 to 2026 for easier loading.
+```powershell
+.\.venv\Scripts\python.exe -m tech_arena download-osm --cached-only
+```
 
-- `district_weather_grid_mapping.csv` records how the 17 sampling locations for each district map to the actual Open-Meteo weather grids used for district aggregation.
+Run the tests and validate the generated outputs:
 
-- `weather_unique_grids.csv` contains the 159 unique Open-Meteo grids used by all districts after shared grids are deduplicated.
+```powershell
+.\.venv\Scripts\python.exe -m pytest
+.\.venv\Scripts\python.exe -m tech_arena validate
+```
 
-- `data/raw/weather_grids/` contains the downloaded hourly weather data for the 159 unique Open-Meteo grids.
+## Step-by-step execution
 
-- `data/processed/weather_validation/` contains district-level quality-control reports covering row counts, spatial metadata, physical sanity checks, variable distributions, spatial spread, and extreme weather observations.
+```powershell
+.\.venv\Scripts\python.exe -m tech_arena download-nafirs
+.\.venv\Scripts\python.exe -m tech_arena prepare-nafirs
+.\.venv\Scripts\python.exe -m tech_arena prepare-locations
+.\.venv\Scripts\python.exe -m tech_arena download-weather
+.\.venv\Scripts\python.exe -m tech_arena build-features
+.\.venv\Scripts\python.exe -m tech_arena train
+.\.venv\Scripts\python.exe -m tech_arena baseline
+.\.venv\Scripts\python.exe -m tech_arena export
+.\.venv\Scripts\python.exe -m tech_arena report
+```
 
-- `data/raw/weather_grid_validation_report.csv` contains the raw-grid validation results. All 159 grids passed validation with no duplicate timestamps, missing hours, missing values, or coordinate errors.
+## Main outputs
 
-- `build_district_weather_hourly.py` builds the final district-level hourly weather dataset from the downloaded grid data and the district-to-grid mapping.
+- `artifacts/day_ahead/` and `artifacts/hour_ahead/`: trained model, validation metrics, and validation predictions.
+- `outputs/day_ahead_predictions.csv`: architecture-expanded, 48-step forecast for each district.
+- `outputs/hour_ahead_predictions.csv`: architecture-expanded, 72-step forecast for each district.
+- `outputs/*_manifest.json`: row counts, checksums and validation information.
+- `reports/mvp_results.md`: generated data and validation summary.
 
-- `validate_weather_grids.py` validates the raw Open-Meteo grid data for completeness, hourly continuity, duplicate timestamps, missing values, and coordinate consistency.
+The output CSVs use the latest available feature row for each district and horizon as a compact inference demonstration. Replace their column adapter and time window when the official sample-submission file is released.
 
-- `validate_district_weather.py` validates the final district-level weather dataset for structural consistency and basic physical sanity.
+## Before the assessed submission
 
-The main dataset includes temperature, relative humidity, dew point, precipitation, rain, snowfall, snow depth, soil moisture, wind speed, wind gusts, surface pressure, wind direction, weather code, and spatial sampling metadata. Continuous weather variables are represented using appropriate district-level spatial statistics such as mean, minimum, and maximum.
+1. Replace the illustrative topology values with the parameters supplied by the organising committee.
+2. Match `export_submission` to the official sample CSV, including column names, units, row order and test window.
+3. Replace the empirical exposure proxy if an official regional-risk target or district customer totals are supplied.
+4. Confirm whether forecast weather is an allowed known covariate and use only forecasts issued by the prediction time.
+5. Run the pipeline from a clean environment, review both manifests, and update the final report with the scored result.
 
-For downstream work, use `data/processed/district_weather_hourly.csv.gz` as the primary weather input. 
+## Data sources
 
-The compressed weather datasets are stored with Git LFS because of their file size. Install Git LFS before cloning or pulling the repository (`git lfs install`) so the full weather data files are downloaded correctly.
-
+The core sources are SSEN NaFIRS LV Faults, SSEN Substation Data and Open-Meteo. OpenStreetMap is optional and is excluded from the core results unless its held-out ablation is beneficial. Source links, licences and attribution requirements are recorded in `SOURCES.md`.
