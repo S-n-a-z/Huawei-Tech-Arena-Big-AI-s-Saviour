@@ -18,7 +18,7 @@ The statistical model estimates district-level grid risk. A separate engineering
 
 ## Current evidence
 
-The recorded development run begins with 220,715 NaFIRS incidents across 33 district codes. The model uses the 31 districts with a supported SSEN operating-area match; NATS and NATSL remain in the audit file but are not silently assigned invented coordinates. On the held-out period, the day-ahead model improves MAE from 0.03457 to 0.02871 and PR-AUC from 0.18897 to 0.30313. The hour-ahead model improves RMSE from 0.09827 to 0.07908 and PR-AUC from 0.42455 to 0.63017, although persistence remains better on MAE. Full figures and limitations are in `reports/technical_report.docx` and `reports/mvp_results.md`.
+The recorded development run begins with 220,715 NaFIRS incidents across 33 district codes. The model uses the 31 districts with a supported SSEN operating-area match; NATS and NATSL remain in the audit file but are not silently assigned invented coordinates. On the held-out period, the day-ahead model improves MAE from 0.03457 to 0.02871 and PR-AUC from 0.18897 to 0.30313. The hour-ahead model improves RMSE from 0.09827 to 0.07908 and PR-AUC from 0.42455 to 0.63017, although persistence remains better on MAE. Full figures and limitations are in `reports/mvp_results.md`.
 
 ## Important final-input note
 
@@ -89,7 +89,6 @@ Run the tests and validate the generated outputs:
 - `outputs/hour_ahead_predictions.csv`: architecture-expanded, 72-step forecast for each district.
 - `outputs/*_manifest.json`: row counts, checksums and validation information.
 - `reports/mvp_results.md`: generated data and validation summary.
-- `reports/technical_report.docx`: Word report prepared for the competition submission.
 
 The output CSVs use the latest available feature row for each district and horizon as a compact inference demonstration. Replace their column adapter and time window when the official sample-submission file is released.
 
