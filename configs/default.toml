@@ -103,7 +103,7 @@ min_samples_leaf = 20
 
 [resilience]
 default_critical_load_kw = 1000.0
-parameter_status = "illustrative_replace_before_scoring"
+parameter_status = "configured_engineering_baseline_v1"
 
 [[resilience.topologies]]
 topology_id = "ups_2n"
