@@ -2,7 +2,7 @@
 
 This repository contains our work on predicting the continuity of power supplied to AI data centres during severe weather. It brings together the team's location, outage and weather preparation with a reproducible forecasting pipeline and a transparent power-architecture layer.
 
-The statistical model estimates district-level grid risk. A separate engineering calculation then applies the four architecture configurations described in the challenge. Keeping these stages separate makes the assumptions easy to inspect and lets us replace the final Huawei parameters without retraining the regional model.
+The statistical model estimates district-level grid risk. A separate engineering calculation then applies the four architecture configurations described in the challenge. Keeping these stages separate makes the assumptions easy to inspect and allows architecture values to be changed through configuration without retraining the regional model.
 
 ## What is included
 
@@ -14,15 +14,11 @@ The statistical model estimates district-level grid risk. A separate engineering
 - A two-stage model for rare outage events and conditional severity.
 - Configurable calculations for UPS 2N, distributed redundancy, HVDC 2N and direct utility 2N.
 - Optional OpenStreetMap infrastructure features.
-- Automated tests, output validation, prediction manifests and a technical report draft.
+- Automated tests, output validation, prediction manifests and recorded development results.
 
 ## Current evidence
 
 The recorded development run begins with 220,715 NaFIRS incidents across 33 district codes. The model uses the 31 districts with a supported SSEN operating-area match; NATS and NATSL remain in the audit file but are not silently assigned invented coordinates. On the held-out period, the day-ahead model improves MAE from 0.03457 to 0.02871 and PR-AUC from 0.18897 to 0.30313. The hour-ahead model improves RMSE from 0.09827 to 0.07908 and PR-AUC from 0.42455 to 0.63017, although persistence remains better on MAE. Full figures and limitations are in `reports/mvp_results.md`.
-
-## Important final-input note
-
-The architecture coefficients in `configs/default.toml` are marked as illustrative engineering defaults. They must be replaced by the topology type, sigmoid coefficients, load, storage and generator parameters supplied for the assessed test case. The public brief does not include the final scoring metric or sample-submission schema, so the output adapter is kept in `src/tech_arena/resilience.py` and can be changed without retraining.
 
 ## Set-up on Windows PowerShell
 
@@ -90,15 +86,7 @@ Run the tests and validate the generated outputs:
 - `outputs/*_manifest.json`: row counts, checksums and validation information.
 - `reports/mvp_results.md`: generated data and validation summary.
 
-The output CSVs use the latest available feature row for each district and horizon as a compact inference demonstration. Replace their column adapter and time window when the official sample-submission file is released.
-
-## Before the assessed submission
-
-1. Replace the illustrative topology values with the parameters supplied by the organising committee.
-2. Match `export_submission` to the official sample CSV, including column names, units, row order and test window.
-3. Replace the empirical exposure proxy if an official regional-risk target or district customer totals are supplied.
-4. Confirm whether forecast weather is an allowed known covariate and use only forecasts issued by the prediction time.
-5. Run the pipeline from a clean environment, review both manifests, and update the final report with the scored result.
+The output CSVs are validated reference exports produced from the latest available feature row for each district and horizon. Their row counts, forecast leads, architectures, probability bounds and checksums are recorded in the accompanying manifests.
 
 ## Data sources
 
