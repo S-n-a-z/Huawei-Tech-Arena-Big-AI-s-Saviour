@@ -101,6 +101,73 @@ learning_rate = 0.06
 max_leaf_nodes = 31
 min_samples_leaf = 20
 
+[phase1]
+training_start = "2025-01-01T00:00:00Z"
+training_end = "2025-08-31T23:45:00Z"
+test_start = "2025-09-01T00:00:00Z"
+test_end = "2025-11-30T23:45:00Z"
+eaglei_url = "https://ndownloader.figshare.com/files/62164877"
+eaglei_md5 = "cd2feb1282a42fb048cb6885398bc1cc"
+mcc_url = "https://ndownloader.figshare.com/files/42547708"
+mcc_md5 = "7e30d47d44cae46b3342cdabf7c84b7f"
+gazetteer_url = "https://www2.census.gov/geo/docs/maps-data/data/gazetteer/2025_Gazetteer/2025_Gaz_counties_national.zip"
+historical_weather_api = "https://archive-api.open-meteo.com/v1/archive"
+single_runs_api = "https://single-runs-api.open-meteo.com/v1/forecast"
+weather_model = "ecmwf_ifs"
+forecast_availability_lag_hours = 6
+event_threshold = 0.001
+task_a_issue_hour_utc = 6
+weather_variables = [
+  "temperature_2m",
+  "relative_humidity_2m",
+  "precipitation",
+  "surface_pressure",
+  "wind_speed_10m",
+  "wind_gusts_10m",
+]
+
+# County selection was fixed using January-August 2025 only. It deliberately
+# spans five weather regimes and excludes any knowledge of the scoring period.
+[[phase1.counties]]
+fips_code = "06037"
+county = "Los Angeles"
+state = "California"
+latitude = 34.196398
+longitude = -118.261862
+total_customers = 3762600
+
+[[phase1.counties]]
+fips_code = "12086"
+county = "Miami-Dade"
+state = "Florida"
+latitude = 25.616009
+longitude = -80.503750
+total_customers = 951391
+
+[[phase1.counties]]
+fips_code = "17031"
+county = "Cook"
+state = "Illinois"
+latitude = 41.894294
+longitude = -87.645455
+total_customers = 2162007
+
+[[phase1.counties]]
+fips_code = "48201"
+county = "Harris"
+state = "Texas"
+latitude = 29.857273
+longitude = -95.393037
+total_customers = 1827686
+
+[[phase1.counties]]
+fips_code = "53033"
+county = "King"
+state = "Washington"
+latitude = 47.490552
+longitude = -121.833977
+total_customers = 963744
+
 [resilience]
 default_critical_load_kw = 1000.0
 parameter_status = "configured_engineering_baseline_v1"
