@@ -11,5 +11,5 @@ Before opening a pull request:
 5. Update the local technical report if a metric, data source, assumption or limitation changed.
 6. Do not commit raw downloads, cached API responses, trained models, credentials or the Word/PDF report.
 
-Use British English in documentation. State assumptions directly, cite source licences, and never describe a development metric as an organiser leaderboard score.
+Cite source licences, and never describe a development metric as an organiser leaderboard score.
 
