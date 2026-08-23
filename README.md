@@ -7,7 +7,7 @@ This repository contains our Phase 1 entry for the AI data-centre power-supply r
 
 The submitted county set is Los Angeles (California), Miami-Dade (Florida), Cook (Illinois), Harris (Texas) and King (Washington). It was fixed using January–August 2025 data only. The counties give broad customer coverage and expose the model to distinct tropical, convective, wind, winter, heat and wildfire-related weather regimes.
 
-## What is ready
+## What is currently available
 
 - `outputs/predictions.csv.zip` contains the final `predictions.csv`, which follows the organiser's seven-column template exactly. Extract it before uploading to Agorize.
 - It contains both tasks, all five counties and every complete rolling forecast batch.
