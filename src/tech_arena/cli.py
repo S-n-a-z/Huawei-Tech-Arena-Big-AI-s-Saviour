@@ -15,6 +15,12 @@ from tech_arena.features import build_task_features
 from tech_arena.model import evaluate_persistence, train_task
 from tech_arena.report import write_mvp_report
 from tech_arena.resilience import export_submission, validate_submission_file
+from tech_arena.phase1.data import download_phase1_data, prepare_phase1_outages
+from tech_arena.phase1.features import build_phase1_features
+from tech_arena.phase1.model import train_phase1_task
+from tech_arena.phase1.pipeline import run_phase1
+from tech_arena.phase1.submission import export_phase1_submission, validate_phase1_file
+from tech_arena.phase1.weather import download_phase1_weather
 
 
 def _date(value: str | None) -> date | None:
@@ -32,6 +38,52 @@ def _add_common(parser: argparse.ArgumentParser) -> None:
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Huawei Tech Arena Topic Two local pipeline")
     subparsers = parser.add_subparsers(dest="command", required=True)
+
+    phase1_download = subparsers.add_parser(
+        "download-phase1-data", help="Download EAGLE-I, customer-count and Gazetteer sources"
+    )
+    _add_common(phase1_download)
+    phase1_download.add_argument("--force", action="store_true")
+
+    phase1_prepare = subparsers.add_parser(
+        "prepare-phase1-data", help="Prepare five-county, 15-minute EAGLE-I history"
+    )
+    _add_common(phase1_prepare)
+
+    phase1_weather = subparsers.add_parser(
+        "download-phase1-weather", help="Download training weather and archived forecast runs"
+    )
+    _add_common(phase1_weather)
+    phase1_weather.add_argument("--mode", choices=("training", "forecast", "all"), default="all")
+    phase1_weather.add_argument("--force", action="store_true")
+
+    phase1_features = subparsers.add_parser(
+        "build-phase1-features", help="Build leakage-safe Phase 1 feature tables"
+    )
+    _add_common(phase1_features)
+    phase1_features.add_argument("--task", choices=("A", "B", "all"), default="all")
+    phase1_features.add_argument("--purpose", choices=("training", "test", "all"), default="all")
+
+    phase1_train = subparsers.add_parser("train-phase1", help="Train the Phase 1 county models")
+    _add_common(phase1_train)
+    phase1_train.add_argument("--task", choices=("A", "B", "all"), default="all")
+
+    phase1_export = subparsers.add_parser(
+        "export-phase1", help="Export the combined organiser-schema predictions.csv"
+    )
+    _add_common(phase1_export)
+
+    phase1_validate = subparsers.add_parser(
+        "validate-phase1", help="Validate Phase 1 schema, batches, horizons and coverage"
+    )
+    _add_common(phase1_validate)
+    phase1_validate.add_argument("--path")
+
+    phase1_all = subparsers.add_parser(
+        "phase1-run-all", help="Run the complete Phase 1 submission pipeline"
+    )
+    _add_common(phase1_all)
+    phase1_all.add_argument("--force-download", action="store_true")
 
     download = subparsers.add_parser("download-nafirs", help="Download current NaFIRS CSV resources")
     _add_common(download)
@@ -100,7 +152,32 @@ def main(argv: Sequence[str] | None = None) -> None:
     args = build_parser().parse_args(argv)
     settings = load_settings(args.config)
 
-    if args.command == "download-nafirs":
+    if args.command == "download-phase1-data":
+        _print(download_phase1_data(settings, force=args.force))
+    elif args.command == "prepare-phase1-data":
+        _print(prepare_phase1_outages(settings))
+    elif args.command == "download-phase1-weather":
+        _print(download_phase1_weather(settings, mode=args.mode, force=args.force))
+    elif args.command == "build-phase1-features":
+        tasks = ("A", "B") if args.task == "all" else (args.task,)
+        purposes = ("training", "test") if args.purpose == "all" else (args.purpose,)
+        _print(
+            {
+                f"{task}_{purpose}": build_phase1_features(settings, task, purpose)
+                for purpose in purposes
+                for task in tasks
+            }
+        )
+    elif args.command == "train-phase1":
+        tasks = ("A", "B") if args.task == "all" else (args.task,)
+        _print({task: train_phase1_task(settings, task) for task in tasks})
+    elif args.command == "export-phase1":
+        _print(export_phase1_submission(settings))
+    elif args.command == "validate-phase1":
+        _print(validate_phase1_file(settings, args.path))
+    elif args.command == "phase1-run-all":
+        _print(run_phase1(settings, force_download=args.force_download))
+    elif args.command == "download-nafirs":
         _print(download_nafirs(settings, force=args.force))
     elif args.command == "prepare-nafirs":
         path = normalize_nafirs(settings)
