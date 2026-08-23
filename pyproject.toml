@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "aidc-resilience"
-version = "0.1.0"
+version = "0.2.0"
 description = "Reproducible forecasting package for Huawei Tech Arena 2026 Topic Two"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -13,6 +13,7 @@ dependencies = [
   "numpy>=2.0,<3",
   "pandas>=2.2,<3",
   "pyproj>=3.7,<4",
+  "requests>=2.32,<3",
   "scikit-learn>=1.5,<2",
 ]
 

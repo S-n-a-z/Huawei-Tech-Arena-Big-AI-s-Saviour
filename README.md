@@ -1,93 +1,58 @@
-# Huawei Tech Arena 2026 - Topic Two
+# Huawei Tech Arena 2026 — Topic Two, Phase 1
 
-This repository contains our work on predicting the continuity of power supplied to AI data centres during severe weather. It brings together the team's location, outage and weather preparation with a reproducible forecasting pipeline and a transparent power-architecture layer.
+This repository contains our Phase 1 entry for the AI data-centre power-supply risk forecasting challenge. The submission predicts the proportion of customers without electricity (`predicted_x`) in five US counties for both required horizons:
 
-The statistical model estimates district-level grid risk. A separate engineering calculation then applies the four architecture configurations described in the challenge. Keeping these stages separate makes the assumptions easy to inspect and allows architecture values to be changed through configuration without retraining the regional model.
+- **Task A:** 48 hourly forecasts, issued once per calendar day;
+- **Task B:** 24 forecasts at 15-minute intervals, covering the next six hours and issued every six hours.
 
-## What is included
+The submitted county set is Los Angeles (California), Miami-Dade (Florida), Cook (Illinois), Harris (Texas) and King (Washington). It was fixed using January–August 2025 data only. The counties give broad customer coverage and expose the model to distinct tropical, convective, wind, winter, heat and wildfire-related weather regimes.
 
-- SSEN substation locations converted from British National Grid coordinates to WGS84.
-- NaFIRS low-voltage incident preparation for the SEPD and SHEPD licence areas.
-- District-level Open-Meteo history, with spatial sampling and validation reports.
-- Causal risk, weather and seasonal features for both forecast horizons.
-- Chronologically purged validation and a persistence baseline.
-- A two-stage model for rare outage events and conditional severity.
-- Configurable calculations for UPS 2N, distributed redundancy, HVDC 2N and direct utility 2N.
-- Optional OpenStreetMap infrastructure features.
-- Automated tests, output validation, prediction manifests and recorded development results.
+## What is ready
 
-## Current evidence
+- `outputs/predictions.csv` follows the organiser's seven-column template exactly.
+- It contains both tasks, all five counties and every complete rolling forecast batch.
+- FIPS codes retain their leading zero and all times use ISO 8601 UTC.
+- `predicted_x` is the customer outage ratio, clipped to `[0, 1]`.
+- `outputs/predictions_manifest.json` records the row counts, validation result and SHA-256 checksum.
+- Automated tests cover schedules, feature causality and submission validation.
 
-The recorded development run begins with 220,715 NaFIRS incidents across 33 district codes. The model uses the 31 districts with a supported SSEN operating-area match; NATS and NATSL remain in the audit file but are not silently assigned invented coordinates. On the held-out period, the day-ahead model improves MAE from 0.03457 to 0.02871 and PR-AUC from 0.18897 to 0.30313. The hour-ahead model improves RMSE from 0.09827 to 0.07908 and PR-AUC from 0.42455 to 0.63017, although persistence remains better on MAE. Full figures and limitations are in `reports/mvp_results.md`.
+The older UK NaFIRS and topology work remains in the codebase as Phase 2 research. It is not used by `predictions.csv`, because the Phase 1 administrator clarified that scoring uses EAGLE-I county FIPS codes and does not include topology coupling.
 
-## Set-up on Windows PowerShell
+## Method in brief
+
+The data preparation builds a complete 15-minute grid from EAGLE-I. The source omits zero-outage rows and cannot distinguish those omissions from collection gaps, so absent rows are set to zero while `record_present` is retained as a missingness feature. The denominator is the official county customer count supplied with the EAGLE-I release.
+
+Each model uses only outage history available before its issue time. Features include current risk, 1/6/24/168-hour lags, causal rolling statistics, data coverage, calendar terms, lead time and ECMWF IFS weather. Historical IFS weather is used for training. Test-period weather comes from Open-Meteo's archived **Single Runs** endpoint, with the model initialisation fixed six hours before the issue time. This conservative delay prevents forecast-availability leakage.
+
+Histogram gradient boosting estimates severe-event probability and outage magnitude. The final magnitude forecast is blended with persistence using a weight selected on a chronological hold-out period. Full validation figures and the weather ablation are in `reports/phase1_results.md`.
+
+## Reproduce the entry
+
+Python 3.12 is recommended. From Windows PowerShell:
 
 ```powershell
 py -3.12 -m venv .venv
 .\.venv\Scripts\python.exe -m pip install --upgrade pip
 .\.venv\Scripts\python.exe -m pip install -e ".[dev]"
+.\.venv\Scripts\python.exe -m tech_arena phase1-run-all
+.\.venv\Scripts\python.exe -m pytest --basetemp .test-tmp
+.\.venv\Scripts\python.exe -m tech_arena validate-phase1
 ```
 
-For the exact environment used for the recorded results:
+The first run downloads roughly 1.4 GB of EAGLE-I data and 366 archived forecast initialisations. On a normal broadband connection and laptop, allow about 15–30 minutes. Later runs reuse the local cache.
+
+The same workflow can be run step by step:
 
 ```powershell
-.\.venv\Scripts\python.exe -m pip install -r requirements-lock.txt
-.\.venv\Scripts\python.exe -m pip install -e . --no-deps
+.\.venv\Scripts\python.exe -m tech_arena download-phase1-data
+.\.venv\Scripts\python.exe -m tech_arena prepare-phase1-data
+.\.venv\Scripts\python.exe -m tech_arena download-phase1-weather
+.\.venv\Scripts\python.exe -m tech_arena build-phase1-features --purpose training
+.\.venv\Scripts\python.exe -m tech_arena train-phase1
+.\.venv\Scripts\python.exe -m tech_arena build-phase1-features --purpose test
+.\.venv\Scripts\python.exe -m tech_arena export-phase1
+.\.venv\Scripts\python.exe -m tech_arena validate-phase1
 ```
 
-## Run the complete pipeline
+Raw data, cached API responses, feature tables and trained models are deliberately excluded from Git. Source links, licences, checksums and attribution are recorded in `SOURCES.md`. The technical report is maintained locally and is not committed to this repository.
 
-```powershell
-.\.venv\Scripts\python.exe -m tech_arena run-all
-```
-
-This performs data acquisition, normalisation, weather download, both feature builds, both training runs, prediction export, validation and results-summary generation. Raw third-party data stay under `data/raw/` and are ignored by Git.
-
-Optional OSM augmentation:
-
-```powershell
-.\.venv\Scripts\python.exe -m tech_arena download-osm
-.\.venv\Scripts\python.exe -m tech_arena build-features --include-osm
-.\.venv\Scripts\python.exe -m tech_arena train
-```
-
-If public Overpass instances are throttled, preserve the completed cache and build a feature table with explicit missingness instead of retrying aggressively:
-
-```powershell
-.\.venv\Scripts\python.exe -m tech_arena download-osm --cached-only
-```
-
-Run the tests and validate the generated outputs:
-
-```powershell
-.\.venv\Scripts\python.exe -m pytest
-.\.venv\Scripts\python.exe -m tech_arena validate
-```
-
-## Step-by-step execution
-
-```powershell
-.\.venv\Scripts\python.exe -m tech_arena download-nafirs
-.\.venv\Scripts\python.exe -m tech_arena prepare-nafirs
-.\.venv\Scripts\python.exe -m tech_arena prepare-locations
-.\.venv\Scripts\python.exe -m tech_arena download-weather
-.\.venv\Scripts\python.exe -m tech_arena build-features
-.\.venv\Scripts\python.exe -m tech_arena train
-.\.venv\Scripts\python.exe -m tech_arena baseline
-.\.venv\Scripts\python.exe -m tech_arena export
-.\.venv\Scripts\python.exe -m tech_arena report
-```
-
-## Main outputs
-
-- `artifacts/day_ahead/` and `artifacts/hour_ahead/`: trained model, validation metrics, and validation predictions.
-- `outputs/day_ahead_predictions.csv`: architecture-expanded, 48-step forecast for each district.
-- `outputs/hour_ahead_predictions.csv`: architecture-expanded, 72-step forecast for each district.
-- `outputs/*_manifest.json`: row counts, checksums and validation information.
-- `reports/mvp_results.md`: generated data and validation summary.
-
-The output CSVs are validated reference exports produced from the latest available feature row for each district and horizon. Their row counts, forecast leads, architectures, probability bounds and checksums are recorded in the accompanying manifests.
-
-## Data sources
-
-The core sources are SSEN NaFIRS LV Faults, SSEN Substation Data and Open-Meteo. OpenStreetMap is optional and is excluded from the core results unless its held-out ablation is beneficial. Source links, licences and attribution requirements are recorded in `SOURCES.md`.
