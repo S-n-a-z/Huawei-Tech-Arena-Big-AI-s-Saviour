@@ -1,4 +1,6 @@
-# Topic Two development results
+# Phase 2 legacy development results
+
+This file records the earlier UK NaFIRS and data-centre topology experiment. It is retained for later phases and is not evidence for, or an input to, the Phase 1 EAGLE-I submission. Current Phase 1 results are in `reports/phase1_results.md`.
 
 > Status: reproducible engineering baseline. Architecture calculations use the
 > versioned configuration recorded in `configs/default.toml`.
