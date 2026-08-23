@@ -1,18 +1,12 @@
-# Prediction outputs
+# Phase 1 prediction output
 
-The two generated CSV files are validated latest-window reference exports from the forecasting and resilience pipeline.
+`predictions.csv` is the single combined prediction file for submission. Its columns match the organiser's template exactly:
 
-Columns:
+`task_id,fips_code,county,state,issue_time,target_time,predicted_x`
 
-- `issue_time`, `target_time`: UTC ISO-8601 timestamps.
-- `network`, `district_id`: SSEN region identifiers.
-- `lead_minutes`: forecast lead time.
-- `architecture_id`, `architecture_name`: one of the four supplied architecture classes.
-- `regional_risk_prediction`: learned regional outage-proportion forecast.
-- `site_risk_score`: topology-dependent sigmoid transformation.
-- `critical_load_coverage_ratio`: configuration-driven engineering result in `[0,1]`.
-- `estimated_backup_duration_hours`: configuration-driven backup-duration estimate.
+The validated file contains 65,880 rows: 22,080 for Task A and 43,800 for Task B. It covers five counties, 92 daily Task A issues and 365 six-hourly Task B issues. Every county/issue batch contains the complete required horizon.
 
-Each export is checked for complete district, lead and architecture coverage, duplicate keys, finite values and valid probability ranges. The accompanying manifest records its row count, configuration status and SHA-256 checksum.
+`predictions_manifest.json` records the validation summary and SHA-256 checksum. Re-run `python -m tech_arena validate-phase1` after any change to the CSV.
 
-`ssen_individual_substation_coordinates.csv` contains one row per unique SSEN physical coordinate. Coordinates are transformed from EPSG:27700 to WGS84; repeated source records are represented by `source_record_count`.
+The earlier SSEN/topology exports are Phase 2 development artefacts and are not part of the Phase 1 submission.
+

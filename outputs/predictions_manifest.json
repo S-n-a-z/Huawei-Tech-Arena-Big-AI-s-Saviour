@@ -1,0 +1,23 @@
+{
+  "rows": 65880,
+  "task_a_rows": 22080,
+  "task_b_rows": 43800,
+  "counties": 5,
+  "complete_county_issue_batches": 2285,
+  "minimum_prediction": 0.0,
+  "maximum_prediction": 0.07988871,
+  "file": "predictions.csv",
+  "sha256": "17b1fb4350967ced1cab1ff8ee7108e31a05573ab9a13d7aba0977803b100e04",
+  "schema": [
+    "task_id",
+    "fips_code",
+    "county",
+    "state",
+    "issue_time",
+    "target_time",
+    "predicted_x"
+  ],
+  "task_a_resolution": "1 hour",
+  "task_b_resolution": "15 minutes",
+  "forecast_weather": "Open-Meteo Single Runs, ECMWF IFS HRES, six-hour availability lag"
+}
