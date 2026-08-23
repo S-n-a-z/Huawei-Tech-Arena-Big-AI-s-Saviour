@@ -7,6 +7,7 @@
   "minimum_prediction": 0.0,
   "maximum_prediction": 0.07988871,
   "file": "predictions.csv",
+  "repository_archive": "predictions.csv.zip",
   "sha256": "17b1fb4350967ced1cab1ff8ee7108e31a05573ab9a13d7aba0977803b100e04",
   "schema": [
     "task_id",
