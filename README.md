@@ -9,7 +9,7 @@ The submitted county set is Los Angeles (California), Miami-Dade (Florida), Cook
 
 ## What is ready
 
-- `outputs/predictions.csv` follows the organiser's seven-column template exactly.
+- `outputs/predictions.csv.zip` contains the final `predictions.csv`, which follows the organiser's seven-column template exactly. Extract it before uploading to Agorize.
 - It contains both tasks, all five counties and every complete rolling forecast batch.
 - FIPS codes retain their leading zero and all times use ISO 8601 UTC.
 - `predicted_x` is the customer outage ratio, clipped to `[0, 1]`.
@@ -55,4 +55,3 @@ The same workflow can be run step by step:
 ```
 
 Raw data, cached API responses, feature tables and trained models are deliberately excluded from Git. Source links, licences, checksums and attribution are recorded in `SOURCES.md`. The technical report is maintained locally and is not committed to this repository.
-
