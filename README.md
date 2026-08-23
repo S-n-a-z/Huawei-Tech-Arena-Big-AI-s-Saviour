@@ -54,4 +54,4 @@ The same workflow can be run step by step:
 .\.venv\Scripts\python.exe -m tech_arena validate-phase1
 ```
 
-Raw data, cached API responses, feature tables and trained models are deliberately excluded from Git. Source links, licences, checksums and attribution are recorded in `SOURCES.md`. The technical report is maintained locally and is not committed to this repository.
+Raw data, cached API responses, feature tables and trained models are deliberately excluded from Git. Source links, licences, checksums and attribution are recorded in `SOURCES.md`.
