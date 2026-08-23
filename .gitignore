@@ -22,4 +22,5 @@ outputs/*
 !outputs/.gitkeep
 !outputs/README.md
 !outputs/predictions.csv
+!outputs/predictions.csv.zip
 !outputs/predictions_manifest.json
