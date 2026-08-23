@@ -1,24 +1,32 @@
-# Validation record
+# Phase 1 submission record
 
-This repository keeps the checks used for the recorded development run close to the code.
+## Required deliverables
 
-## Data and features
+- [x] A 3–8 page technical report has been prepared locally in Word.
+- [x] A combined `predictions.csv` contains Tasks A and B.
+- [x] Complete source code and a reproducibility guide are present in the repository.
+- [x] All data sources and licences are declared in `SOURCES.md` and in the report.
 
-- Source links, licences and download checksums are recorded.
-- Weather and outage features use information available at or before the issue time.
-- The model uses the 31 districts with a supported SSEN operating-area match.
-- NATS and NATSL remain in the audit trail and are not assigned invented coordinates.
+## Prediction checks
 
-## Model evidence
+- [x] The column order is identical to the organiser's template.
+- [x] Five EAGLE-I counties are used and justified without test-period selection leakage.
+- [x] FIPS codes are five-character strings, including `06037`.
+- [x] Task A has 48 hourly targets in every county/issue batch.
+- [x] Task B has 24 fifteen-minute targets in every county/issue batch.
+- [x] Rolling issues cover every scoring timestamp from 1 September to 30 November 2025 UTC.
+- [x] All times are ISO 8601 UTC and all predictions are finite values in `[0, 1]`.
+- [x] The file has no duplicate forecast keys or missing values.
+- [x] The generated file contains 65,880 rows and passes `validate-phase1`.
 
-- Training and test rows are separated chronologically with a purge equal to the forecast horizon.
-- Persistence is evaluated on the same held-out rows as the learned model.
-- MAE, RMSE, high-risk error and rare-event ranking metrics are recorded for both tasks.
-- Architecture calculations are controlled by the versioned values in `configs/default.toml`.
+## Leakage and reproducibility checks
 
-## Automated controls
+- [x] Outage history ends 15 minutes before each issue time.
+- [x] The model-selection split is chronological and purged by the task horizon.
+- [x] Test weather uses individual ECMWF IFS forecast runs initialised six hours before issue time.
+- [x] The EAGLE-I source checksums are verified before preparation.
+- [x] Random seeds, county coordinates, customer denominators and forecast schedules are versioned.
+- [x] Raw data, API caches, trained artefacts and the local Word report are excluded from Git.
 
-- `python -m pytest` checks configuration, causal features, weather adaptation and export validation.
-- `python -m tech_arena validate` checks columns, row keys, forecast leads, architectures and value ranges.
-- Every reference CSV has a manifest containing its row count and SHA-256 checksum.
-- GitHub Actions runs the complete test suite on pushes and pull requests.
+The final upload should contain the report PDF, `predictions.csv`, and the repository source/reproducibility material. Do not substitute either of the older UK/topology output files.
+
