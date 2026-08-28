@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "purpose": "Exact, training-free reproduction of the submitted Phase 1 predictions",
+  "environment": {
+    "python": "3.12.13",
+    "scikit_learn": "1.9.0",
+    "pandas": "2.3.3",
+    "numpy": "2.5.2",
+    "joblib": "1.5.3"
+  },
+  "submitted_predictions": {
+    "path": "outputs/predictions.csv",
+    "rows": 65880,
+    "sha256": "17b1fb4350967ced1cab1ff8ee7108e31a05573ab9a13d7aba0977803b100e04"
+  },
+  "tasks": {
+    "A": {
+      "model": {
+        "path": "artifacts/phase1/A/model.joblib",
+        "bytes": 1283210,
+        "sha256": "7306b84b380c522fa8cb1985956e7cada6701b8211fa021a39503fd038aef317"
+      },
+      "features": {
+        "path": "data/processed/phase1_A_test.csv.gz",
+        "bytes": 526466,
+        "sha256": "910d2fd9b6a9f1c5aa8d14f4f4c4ac934708a7ca164988872745f1ab4c8d7f97"
+      }
+    },
+    "B": {
+      "model": {
+        "path": "artifacts/phase1/B/model.joblib",
+        "bytes": 1288618,
+        "sha256": "132cd48c04fcd2dd06684abf5bdd169ac21031c42146c11253f3d864ef63f896"
+      },
+      "features": {
+        "path": "data/processed/phase1_B_test.csv.gz",
+        "bytes": 1293582,
+        "sha256": "6a98273867aba898f918b53f4a2177b11950914baca943928a1bf404e4c9a4c5"
+      }
+    }
+  },
+  "task_a_target_definition": "Point value at each exact hourly target timestamp; hourly mean aggregation was suggested but was not used by the frozen model.",
+  "external_api_required_for_frozen_inference": false
+}
