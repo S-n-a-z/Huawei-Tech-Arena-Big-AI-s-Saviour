@@ -1,0 +1,31 @@
+{
+  "task_id": "B",
+  "train_rows": 90355,
+  "validation_rows": 22680,
+  "train_start": "2025-01-08T00:15:00+00:00",
+  "validation_start": "2025-07-15T12:15:00+00:00",
+  "event_threshold": 0.001,
+  "validation_event_rate": 0.0896384479717813,
+  "event_pr_auc": 0.41023069313784594,
+  "selected_persistence_weight": 0.7000000000000001,
+  "selected": {
+    "mae": 0.000371337150897581,
+    "rmse": 0.0010803583943955035,
+    "high_risk_mae": 0.0015708627323240644
+  },
+  "weather_model_unblended": {
+    "mae": 0.00041959815386077127,
+    "rmse": 0.0010557093831107722,
+    "high_risk_mae": 0.001508941853804274
+  },
+  "history_only_ablation": {
+    "mae": 0.00041632597823254905,
+    "rmse": 0.0010700549346334502,
+    "high_risk_mae": 0.0015345048129378135
+  },
+  "persistence_baseline": {
+    "mae": 0.0003873995850211672,
+    "rmse": 0.0011356560224697043,
+    "high_risk_mae": 0.0016617124207011916
+  }
+}
