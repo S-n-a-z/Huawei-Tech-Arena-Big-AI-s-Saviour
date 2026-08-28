@@ -19,7 +19,11 @@ from tech_arena.phase1.data import download_phase1_data, prepare_phase1_outages
 from tech_arena.phase1.features import build_phase1_features
 from tech_arena.phase1.model import train_phase1_task
 from tech_arena.phase1.pipeline import run_phase1
-from tech_arena.phase1.submission import export_phase1_submission, validate_phase1_file
+from tech_arena.phase1.submission import (
+    export_phase1_submission,
+    reproduce_phase1_submission,
+    validate_phase1_file,
+)
 from tech_arena.phase1.weather import download_phase1_weather
 
 
@@ -72,6 +76,13 @@ def build_parser() -> argparse.ArgumentParser:
         "export-phase1", help="Export the combined organiser-schema predictions.csv"
     )
     _add_common(phase1_export)
+
+    phase1_infer = subparsers.add_parser(
+        "infer-phase1",
+        help="Reproduce predictions from the submitted frozen models and feature tables",
+    )
+    _add_common(phase1_infer)
+    phase1_infer.add_argument("--output", default="outputs/reproduced_predictions.csv")
 
     phase1_validate = subparsers.add_parser(
         "validate-phase1", help="Validate Phase 1 schema, batches, horizons and coverage"
@@ -173,6 +184,8 @@ def main(argv: Sequence[str] | None = None) -> None:
         _print({task: train_phase1_task(settings, task) for task in tasks})
     elif args.command == "export-phase1":
         _print(export_phase1_submission(settings))
+    elif args.command == "infer-phase1":
+        _print(reproduce_phase1_submission(settings, args.output))
     elif args.command == "validate-phase1":
         _print(validate_phase1_file(settings, args.path))
     elif args.command == "phase1-run-all":
