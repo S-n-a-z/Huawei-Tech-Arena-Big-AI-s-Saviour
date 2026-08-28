@@ -16,8 +16,12 @@ data/interim/*
 !data/interim/.gitkeep
 data/processed/*
 !data/processed/.gitkeep
+!data/processed/phase1_A_test.csv.gz
+!data/processed/phase1_B_test.csv.gz
 artifacts/*
 !artifacts/.gitkeep
+!artifacts/phase1/
+!artifacts/phase1/**
 outputs/*
 !outputs/.gitkeep
 !outputs/README.md

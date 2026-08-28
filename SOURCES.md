@@ -19,3 +19,15 @@ Suggested citations are V. Tansakul *et al.*, “EAGLE-I Power Outage Data 2025,
 
 SSEN NaFIRS, SSEN substation data and OpenStreetMap appear only in the retained Phase 2 research code. They do not contribute to the Phase 1 predictions.
 
+## Recorded Phase 1 retrieval specification
+
+The submitted run used the following fixed inputs and parameters:
+
+- **EAGLE-I outage history:** `eaglei_outages_2025.csv`, downloaded from Figshare file `62164877`. Training labels end at 31 August 2025 23:45 UTC. The dense history used for causal features runs from 1 January to 30 November 2025 at 15-minute intervals.
+- **County denominators:** `MCC.csv`, Figshare file `42547708`. The configured FIPS codes are `06037`, `12086`, `17031`, `48201` and `53033`.
+- **Training weather:** Open-Meteo Historical Weather API, `https://archive-api.open-meteo.com/v1/archive`, from 1 January to 31 August 2025, model `ecmwf_ifs`, timezone `GMT`.
+- **Inference weather:** Open-Meteo Single Runs API, `https://single-runs-api.open-meteo.com/v1/forecast`, model `ecmwf_ifs`, timezone `GMT`, `forecast_hours=60`. Required run initialisations span 31 August 2025 00:00 UTC to 30 November 2025 12:00 UTC. For every forecast issue, the selected model run is exactly six hours earlier.
+- **Weather variables:** `temperature_2m`, `relative_humidity_2m`, `precipitation`, `surface_pressure`, `wind_speed_10m` and `wind_gusts_10m` at the five county coordinates recorded in `configs/default.toml`.
+- **Test window:** target timestamps from 1 September through 30 November 2025 UTC. Task A uses 48 one-hour leads; Task B uses 24 fifteen-minute leads.
+
+Large public raw files and individual API-response caches are omitted from the repository. The exact engineered inference tables are included because they are compact, remove dependence on mutable external APIs and correspond directly to the frozen submitted models.

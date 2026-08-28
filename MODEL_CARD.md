@@ -14,11 +14,19 @@ The five selected counties are Los Angeles, Miami-Dade, Cook, Harris and King. S
 
 Training weather comes from Open-Meteo's historical ECMWF IFS series. Test features use the archived Single Runs API. Each forecast run is initialised six hours before its issue time, which is a conservative allowance for the stated four-to-six-hour ECMWF publication delay. Continuous weather variables are linearly interpolated to 15-minute targets; the hourly precipitation value is carried within its hour.
 
+For Task A, the target is the EAGLE-I ratio at each exact hourly target timestamp. The administrator described hourly mean aggregation as a suggestion rather than a fixed Phase 1 rule. We retained point targets so that every prediction maps directly to its stated `target_time`, and we did not alter the frozen model after generating the submitted CSV.
+
 ## Model and validation
 
 Separate histogram gradient-boosting models are fitted for Tasks A and B. A balanced classifier estimates the probability of an outage ratio of at least 0.001. A weighted regressor estimates the transformed outage ratio, giving six times the weight to severe rows. The magnitude estimate is blended with current-risk persistence. The blend is chosen on a chronological 20% hold-out, separated from training by the maximum forecast horizon, and the final model is then refitted on all pre-test data.
 
 The recorded hold-out MAE is 0.000430 for Task A and 0.000371 for Task B. Both improve on persistence (0.000468 and 0.000387 respectively). Weather improves high-risk error in both tasks; the full comparison, including the small unblended average-error trade-off, is in `reports/phase1_results.md`.
+
+## Frozen inference record
+
+The exact Task A and Task B estimators are stored in `artifacts/phase1`. Each serialised `Phase1Forecaster` contains its fitted imputer, ordinal county encoder, gradient-boosting classifier, gradient-boosting regressor, selected feature columns and persistence weight. No separate preprocessing object is required.
+
+The two compressed tables in `data/processed/phase1_*_test.csv.gz` are the exact engineered inputs used for the submission. They freeze the historical outage state and archived ECMWF IFS forecast values, so the submitted CSV can be reproduced without an external API call. `artifacts/phase1/inference_manifest.json` verifies all four files before inference. The command `python -m tech_arena infer-phase1` loads these artefacts without retraining and checks that the generated CSV matches the submitted file exactly.
 
 ## Limitations
 

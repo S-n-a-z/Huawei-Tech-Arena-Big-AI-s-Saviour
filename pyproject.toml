@@ -7,7 +7,7 @@ name = "aidc-resilience"
 version = "0.2.0"
 description = "Reproducible forecasting package for Huawei Tech Arena 2026 Topic Two"
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.12,<3.13"
 dependencies = [
   "joblib>=1.4,<2",
   "numpy>=2.0,<3",
