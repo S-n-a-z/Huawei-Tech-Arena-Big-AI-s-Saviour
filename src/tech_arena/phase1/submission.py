@@ -26,6 +26,11 @@ SUBMISSION_COLUMNS = [
 FROZEN_INFERENCE_MANIFEST = Path("artifacts/phase1/inference_manifest.json")
 
 
+def _write_submission_csv(frame: pd.DataFrame, path: Path) -> None:
+    """Write the CSV deterministically on Windows, macOS and Linux."""
+    frame.to_csv(path, index=False, lineterminator="\r\n")
+
+
 def _iso_utc(values: pd.Series) -> pd.Series:
     timestamps = pd.to_datetime(values, utc=True)
     return timestamps.dt.strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -141,7 +146,7 @@ def export_phase1_submission(settings: Settings) -> dict[str, Any]:
     combined = _submission_frame(parts)
     validation = validate_phase1_submission(combined, settings)
     destination = settings.path("output_dir") / "predictions.csv"
-    combined.to_csv(destination, index=False)
+    _write_submission_csv(combined, destination)
     digest = hashlib.sha256(destination.read_bytes()).hexdigest()
     manifest = {
         **validation,
@@ -180,7 +185,7 @@ def reproduce_phase1_submission(
     if not output_path.is_absolute():
         output_path = settings.root / output_path
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    combined.to_csv(output_path, index=False)
+    _write_submission_csv(combined, output_path)
 
     digest = _sha256(output_path)
     expected = str(manifest["submitted_predictions"]["sha256"])
