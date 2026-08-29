@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/huawei-tech-arena/site-architecture.schema.json",
+  "title": "Site architecture input for the unscored resilience extension",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "site_id",
+    "architecture_id",
+    "critical_load_kw",
+    "protected_load_fraction",
+    "usable_energy_kwh",
+    "generator_endurance_hours",
+    "utility_feed_count",
+    "redundancy_class",
+    "transfer_time_seconds",
+    "parameter_status",
+    "provenance"
+  ],
+  "properties": {
+    "site_id": {"type": "string", "minLength": 1},
+    "architecture_id": {"type": "string", "minLength": 1},
+    "critical_load_kw": {"type": "number", "exclusiveMinimum": 0},
+    "protected_load_fraction": {"type": "number", "minimum": 0, "maximum": 1},
+    "usable_energy_kwh": {"type": "number", "minimum": 0},
+    "generator_endurance_hours": {"type": "number", "minimum": 0},
+    "utility_feed_count": {"type": "integer", "minimum": 1},
+    "redundancy_class": {
+      "type": "string",
+      "enum": ["N", "N+1", "distributed_redundancy", "2N", "2N+1", "other"]
+    },
+    "transfer_time_seconds": {"type": "number", "minimum": 0},
+    "maintenance_state": {
+      "type": "string",
+      "enum": ["normal", "planned_degradation", "unplanned_degradation", "unknown"]
+    },
+    "parameter_status": {
+      "type": "string",
+      "enum": ["illustrative", "site_supplied_unreviewed", "engineer_reviewed"]
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "reviewed_by", "review_date"],
+      "properties": {
+        "source": {"type": "string", "minLength": 1},
+        "reviewed_by": {"type": "string"},
+        "review_date": {"type": ["string", "null"], "format": "date"}
+      }
+    }
+  }
+}

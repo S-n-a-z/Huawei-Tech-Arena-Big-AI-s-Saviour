@@ -170,7 +170,7 @@ total_customers = 963744
 
 [resilience]
 default_critical_load_kw = 1000.0
-parameter_status = "configured_engineering_baseline_v1"
+parameter_status = "illustrative_unscored_baseline_requires_site_review"
 
 [[resilience.topologies]]
 topology_id = "ups_2n"
