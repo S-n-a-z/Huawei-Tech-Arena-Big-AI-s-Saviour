@@ -22,6 +22,16 @@ Separate histogram gradient-boosting models are fitted for Tasks A and B. A bala
 
 The recorded hold-out MAE is 0.000430 for Task A and 0.000371 for Task B. Both improve on persistence (0.000468 and 0.000387 respectively). Weather improves high-risk error in both tasks; the full comparison, including the small unblended average-error trade-off, is in `reports/phase1_results.md`.
 
+## Explainability and error slices
+
+`python -m tech_arena diagnose-phase1` recreates the committed lead-time and county error summaries from the recorded hold-out predictions. Task A improves on persistence in all four lead bands, from 4.7% at 13–24 hours to 13.7% at 1–12 hours. It also improves in every county, although Cook County has the smallest margin (0.6%).
+
+Task B improves in every county and in the three lead bands from 105 minutes to six hours. At 15–90 minutes the selected global blend is 2.9% worse than persistence. This is a known local limitation: a lead-dependent blend may improve it, but it has not been substituted into the frozen submission without a complete retraining and validation run. Detailed figures are stored in `reports/phase1_diagnostics.json`; row-level absolute errors are in `artifacts/phase1/*/validation_diagnostics.csv.gz`.
+
+## Architecture-aware extension
+
+The retained topology module is a deliberately separate research layer. It can translate a regional outage forecast into site-level indicators once a team supplies reviewed architecture parameters, including critical load, usable stored energy, generator endurance, redundancy and transfer behaviour. The present defaults are illustrative engineering baselines, not measured data-centre configurations. They do not affect `outputs/predictions.csv` and must not be used for operational decisions without site-specific calibration. The interface and validation gates are documented in `docs/TOPOLOGY_EXTENSION.md` and `configs/site_architecture.schema.json`.
+
 ## Frozen inference record
 
 The exact Task A and Task B estimators are stored in `artifacts/phase1`. Each serialised `Phase1Forecaster` contains its fitted imputer, ordinal county encoder, gradient-boosting classifier, gradient-boosting regressor, selected feature columns and persistence weight. No separate preprocessing object is required.
@@ -35,6 +45,7 @@ The two compressed tables in `data/processed/phase1_*_test.csv.gz` are the exact
 - Training weather is a historical IFS proxy, whereas test weather is reconstructed from individual forecast initialisations.
 - The county set is deliberately small and should not be treated as a nationally calibrated model.
 - The topology and data-centre backup-power calculations are outside Phase 1 scoring and are not applied to `predictions.csv`.
+- The selected Task B blend does not beat persistence in the shortest 15–90-minute diagnostic band, even though it improves overall hold-out MAE.
 
 ## Responsible use
 

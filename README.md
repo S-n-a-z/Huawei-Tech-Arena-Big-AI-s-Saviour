@@ -22,7 +22,9 @@ The repository does not need separate scaler or encoder files: those fitted obje
 
 ## Reproduce the submitted CSV without training
 
-Python 3.12.13 and the pinned package versions in `requirements-lock.txt` reproduce the recorded run. From the repository root in Windows PowerShell:
+Python 3.12.13 and the pinned package versions in `requirements-lock.txt` reproduce the recorded run. The organiser permits Python 3.9 or later; this project states the exact interpreter used so that the submitted serialised models can be loaded consistently.
+
+From the repository root in Windows PowerShell:
 
 ```powershell
 py -3.12 -m venv .venv
@@ -31,6 +33,17 @@ py -3.12 -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -e . --no-deps
 .\.venv\Scripts\python.exe -m tech_arena infer-phase1
 .\.venv\Scripts\python.exe validate_submission.py outputs\reproduced_predictions.csv
+```
+
+On Linux or macOS, use the equivalent commands:
+
+```bash
+python3.12 -m venv .venv
+.venv/bin/python -m pip install --upgrade pip
+.venv/bin/python -m pip install -r requirements-lock.txt
+.venv/bin/python -m pip install -e . --no-deps
+.venv/bin/python -m tech_arena infer-phase1
+.venv/bin/python validate_submission.py outputs/reproduced_predictions.csv
 ```
 
 `infer-phase1` only loads the frozen models and frozen test feature tables. It does not download data, call an API or refit a model. The command writes `outputs/reproduced_predictions.csv` and checks that it is byte-for-byte identical to the submitted `outputs/predictions.csv`.
@@ -48,6 +61,8 @@ Run the tests with:
 .\.venv\Scripts\python.exe -m pytest --basetemp .test-tmp
 ```
 
+Use `.venv/bin/python -m pytest --basetemp .test-tmp` on Linux or macOS. The same test suite also runs on Ubuntu through GitHub Actions.
+
 ## Method in brief
 
 The preparation stage builds a complete 15-minute grid from EAGLE-I. The source omits zero-outage rows and cannot distinguish those omissions from collection gaps, so absent rows are set to zero while `record_present` is retained as a missingness feature. The denominator is the official county customer count supplied with the EAGLE-I release.
@@ -55,6 +70,14 @@ The preparation stage builds a complete 15-minute grid from EAGLE-I. The source 
 Every model feature is available before the forecast issue time. Inputs include current risk, 1/6/24/168-hour lags, causal rolling statistics, data coverage, calendar terms, lead time and ECMWF IFS weather. Training uses historical ECMWF IFS fields. The test-period weather was taken from archived Open-Meteo Single Runs, with each model run fixed six hours before the corresponding issue time.
 
 Separate histogram-gradient-boosting models estimate outage magnitude for Tasks A and B. Their outputs are blended with persistence using weights chosen on chronological hold-out data. The classifier stored in each fitted pipeline is used for event diagnostics; the submitted magnitude is produced by the regressor and persistence blend.
+
+The command below exports a transparent breakdown by lead-time band and county from the recorded chronological hold-outs:
+
+```powershell
+.\.venv\Scripts\python.exe -m tech_arena diagnose-phase1
+```
+
+The command summarises the committed row-level diagnostic records without needing the full training cache. Add `--rebuild` after a full training run to reconstruct those records from the training features and recorded validation predictions. The committed summary is in `reports/phase1_diagnostics.json`. Task A improves on persistence in every reported lead band and county. Task B improves from 105 minutes onwards; for 15–90 minutes, persistence remains 2.9% better. This local weakness is reported rather than hidden, and is a natural target for a future lead-dependent blend.
 
 ### Task A aggregation choice
 
@@ -76,6 +99,8 @@ The following route downloads the public sources, rebuilds both feature sets, tr
 
 Allow roughly 35–100 minutes for an uncached run, depending mainly on network and API response times. This route is provided for methodology review; it is **not** the command for reproducing the submitted file, because it deliberately retrains the models. Use `infer-phase1` for submission reproduction.
 
-The older NaFIRS and topology code remains as Phase 2 research. It does not contribute to Phase 1 predictions, because Phase 1 is scored against EAGLE-I county data without topology coupling.
+The older NaFIRS and topology code remains as an architecture-aware extension for later phases. It does not contribute to Phase 1 predictions, because Phase 1 is scored against EAGLE-I county data without topology coupling. `docs/TOPOLOGY_EXTENSION.md` explains the boundary between the scored path and this forward-looking work, including the site inputs that must be validated before operational use.
+
+Some historic GitHub paths may appear as Git LFS pointer files when the public raw caches have not been fetched. They are not inputs to frozen Phase 1 inference. The submission ZIP excludes those pointer-only cache entries while retaining the acquisition code, source declarations and compact frozen inference artefacts.
 
 The technical report is maintained and submitted separately, so its editable Word source is not stored in this repository.

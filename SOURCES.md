@@ -17,7 +17,15 @@ The EAGLE-I files used in the recorded run have these MD5 checksums:
 
 Suggested citations are V. Tansakul *et al.*, “EAGLE-I Power Outage Data 2025,” Oak Ridge National Laboratory, 2026, doi: 10.13139/ORNLNCCS/3012826; S. Tansakul *et al.*, “A dataset of recorded electricity outages by United States county 2014–2022,” *Scientific Data*, vol. 11, art. 271, 2024, doi: 10.1038/s41597-024-03095-5; and P. Zippenfenig, “Open-Meteo.com Weather API,” Zenodo, 2023, doi: 10.5281/zenodo.7970649.
 
-SSEN NaFIRS, SSEN substation data and OpenStreetMap appear only in the retained Phase 2 research code. They do not contribute to the Phase 1 predictions.
+SSEN NaFIRS, SSEN substation data and OpenStreetMap appear only in the retained architecture-aware research code. They do not contribute to the Phase 1 predictions. Their provenance is recorded because the repository deliberately goes beyond the minimum Phase 1 path:
+
+| Extension source | Intended research use | Licence / terms | Access |
+|---|---|---|---|
+| SSEN Distribution NaFIRS LV Faults | Planned and unplanned low-voltage fault history for later regional modelling | CC BY 4.0 | https://data.ssen.co.uk/@ssen-distribution/nafirs-lv-faults |
+| SSEN Distribution Substation Data | Network-area locations and asset context for later spatial coupling | CC BY 4.0 | https://data.ssen.co.uk/@ssen-distribution/ssen-substation-data |
+| OpenStreetMap contributors | Optional power-line and substation context | ODbL 1.0; attribution required | https://www.openstreetmap.org/copyright |
+
+These extension datasets were not transferred into the scored US model. The different geography and label definitions prevent them from being treated as direct Phase 1 training observations.
 
 ## Recorded Phase 1 retrieval specification
 
