@@ -16,6 +16,7 @@ from tech_arena.model import evaluate_persistence, train_task
 from tech_arena.report import write_mvp_report
 from tech_arena.resilience import export_submission, validate_submission_file
 from tech_arena.phase1.data import download_phase1_data, prepare_phase1_outages
+from tech_arena.phase1.diagnostics import build_phase1_diagnostics
 from tech_arena.phase1.features import build_phase1_features
 from tech_arena.phase1.model import train_phase1_task
 from tech_arena.phase1.pipeline import run_phase1
@@ -89,6 +90,17 @@ def build_parser() -> argparse.ArgumentParser:
     )
     _add_common(phase1_validate)
     phase1_validate.add_argument("--path")
+
+    phase1_diagnostics = subparsers.add_parser(
+        "diagnose-phase1",
+        help="Export lead-time and county error breakdowns for the chronological hold-outs",
+    )
+    _add_common(phase1_diagnostics)
+    phase1_diagnostics.add_argument(
+        "--rebuild",
+        action="store_true",
+        help="Rebuild row-level diagnostics from training features and validation predictions",
+    )
 
     phase1_all = subparsers.add_parser(
         "phase1-run-all", help="Run the complete Phase 1 submission pipeline"
@@ -188,6 +200,8 @@ def main(argv: Sequence[str] | None = None) -> None:
         _print(reproduce_phase1_submission(settings, args.output))
     elif args.command == "validate-phase1":
         _print(validate_phase1_file(settings, args.path))
+    elif args.command == "diagnose-phase1":
+        _print(build_phase1_diagnostics(settings, rebuild=args.rebuild))
     elif args.command == "phase1-run-all":
         _print(run_phase1(settings, force_download=args.force_download))
     elif args.command == "download-nafirs":
