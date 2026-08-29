@@ -24,7 +24,21 @@ The selected persistence weights are 0.60 for Task A and 0.70 for Task B. Both s
 
 Weather improves high-risk error in both tasks and gives the clearest benefit for Task A. The small average-error trade-off in the unblended model is controlled by the validation-selected persistence blend. On that evidence, archived forecast weather remains in the final pipeline.
 
+## Error slices
+
+| Task | Lead-time band | Selected MAE | Persistence MAE | Relative change |
+|---|---|---:|---:|---:|
+| A | 1–12 h | 0.000310 | 0.000360 | 13.7% better |
+| A | 13–24 h | 0.000469 | 0.000492 | 4.7% better |
+| A | 25–36 h | 0.000448 | 0.000482 | 7.0% better |
+| A | 37–48 h | 0.000494 | 0.000537 | 8.0% better |
+| B | 15–90 min | 0.000227 | 0.000221 | 2.9% worse |
+| B | 105–180 min | 0.000338 | 0.000348 | 2.7% better |
+| B | 195–270 min | 0.000458 | 0.000485 | 5.6% better |
+| B | 285–360 min | 0.000462 | 0.000496 | 6.8% better |
+
+The detailed county and lead-time records are exported by `python -m tech_arena diagnose-phase1`. Task A improves in every county; Task B also improves in every county when averaged over its complete six-hour horizon. The shortest Task B band is the exception and is reported as a candidate for a future lead-dependent blend. We have not changed the submitted model on the strength of a post-hoc slice alone.
+
 ## Final prediction file
 
 The export contains 65,880 rows: 22,080 for Task A and 43,800 for Task B. It includes 2,285 complete county/issue batches and passes the schema, range, duplicate, horizon and scoring-window coverage checks. The recorded SHA-256 checksum is `17b1fb4350967ced1cab1ff8ee7108e31a05573ab9a13d7aba0977803b100e04`.
-

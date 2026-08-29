@@ -1,0 +1,143 @@
+{
+  "description": "Recorded chronological hold-out diagnostics",
+  "A": {
+    "rows": 11280,
+    "by_lead_band": [
+      {
+        "lead_band": "1-12 h",
+        "rows": 2820,
+        "selected_mae": 0.00031022720238147534,
+        "persistence_mae": 0.00035956898857531053,
+        "improvement_percent": 13.722481015211553
+      },
+      {
+        "lead_band": "13-24 h",
+        "rows": 2820,
+        "selected_mae": 0.00046927425682354,
+        "persistence_mae": 0.0004922376009351249,
+        "improvement_percent": 4.665093456485325
+      },
+      {
+        "lead_band": "25-36 h",
+        "rows": 2820,
+        "selected_mae": 0.0004481484641259985,
+        "persistence_mae": 0.00048185244903761336,
+        "improvement_percent": 6.994669214389311
+      },
+      {
+        "lead_band": "37-48 h",
+        "rows": 2820,
+        "selected_mae": 0.0004939326717610387,
+        "persistence_mae": 0.0005370403095641109,
+        "improvement_percent": 8.026890539754929
+      }
+    ],
+    "by_county": [
+      {
+        "county": "Los Angeles",
+        "rows": 2256,
+        "selected_mae": 0.00030390562413002445,
+        "persistence_mae": 0.0003523245818399606,
+        "improvement_percent": 13.742713453905385
+      },
+      {
+        "county": "Miami-Dade",
+        "rows": 2256,
+        "selected_mae": 0.00036950558335985663,
+        "persistence_mae": 0.00038914931508532554,
+        "improvement_percent": 5.047864910455206
+      },
+      {
+        "county": "Cook",
+        "rows": 2256,
+        "selected_mae": 0.0005624704632373987,
+        "persistence_mae": 0.0005656049010567858,
+        "improvement_percent": 0.554174444657509
+      },
+      {
+        "county": "Harris",
+        "rows": 2256,
+        "selected_mae": 0.0005005612006793624,
+        "persistence_mae": 0.0005933121432632666,
+        "improvement_percent": 15.632739635795458
+      },
+      {
+        "county": "King",
+        "rows": 2256,
+        "selected_mae": 0.00041553537245842334,
+        "persistence_mae": 0.0004379832438948612,
+        "improvement_percent": 5.125280875317348
+      }
+    ]
+  },
+  "B": {
+    "rows": 22680,
+    "by_lead_band": [
+      {
+        "lead_band": "15-90 min",
+        "rows": 5670,
+        "selected_mae": 0.00022719055488272782,
+        "persistence_mae": 0.00022087068216161852,
+        "improvement_percent": -2.861345226653861
+      },
+      {
+        "lead_band": "105-180 min",
+        "rows": 5670,
+        "selected_mae": 0.0003381995015350588,
+        "persistence_mae": 0.00034773763345445846,
+        "improvement_percent": 2.742910459430859
+      },
+      {
+        "lead_band": "195-270 min",
+        "rows": 5670,
+        "selected_mae": 0.0004579272377412552,
+        "persistence_mae": 0.00048534934804395975,
+        "improvement_percent": 5.6499736557224844
+      },
+      {
+        "lead_band": "285-360 min",
+        "rows": 5670,
+        "selected_mae": 0.0004620313094311333,
+        "persistence_mae": 0.0004956406764245621,
+        "improvement_percent": 6.780994497037459
+      }
+    ],
+    "by_county": [
+      {
+        "county": "Los Angeles",
+        "rows": 4536,
+        "selected_mae": 0.0002490368026035063,
+        "persistence_mae": 0.00025538898296430246,
+        "improvement_percent": 2.4872570018746902
+      },
+      {
+        "county": "Miami-Dade",
+        "rows": 4536,
+        "selected_mae": 0.00028502982352727953,
+        "persistence_mae": 0.0002901967839359312,
+        "improvement_percent": 1.7805022986720667
+      },
+      {
+        "county": "Cook",
+        "rows": 4536,
+        "selected_mae": 0.0002999975928935149,
+        "persistence_mae": 0.0003049560058780037,
+        "improvement_percent": 1.6259437062775464
+      },
+      {
+        "county": "Harris",
+        "rows": 4536,
+        "selected_mae": 0.0005271560054937919,
+        "persistence_mae": 0.0005798807602016322,
+        "improvement_percent": 9.092344207024071
+      },
+      {
+        "county": "King",
+        "rows": 4536,
+        "selected_mae": 0.0004954655299696263,
+        "persistence_mae": 0.000506575392125879,
+        "improvement_percent": 2.1931310381322238
+      }
+    ]
+  }
+}
