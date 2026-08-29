@@ -32,7 +32,10 @@
 - [x] The frozen Task A and B inference feature tables are included.
 - [x] `infer-phase1` reproduces the submitted CSV without downloading data or retraining.
 - [x] The inference manifest verifies the frozen artefacts and submitted prediction file.
+- [x] Lead-time and county diagnostics can be regenerated from the recorded hold-out predictions.
+- [x] Windows, Linux and macOS reproduction commands are documented; CI exercises the Linux route.
 - [x] Large reconstructable raw data and API caches remain excluded, as permitted by the latest administrator clarification.
+- [x] Optional architecture-aware work is retained but clearly separated from the scored Phase 1 path.
 - [x] The editable Word report remains outside Git.
 
 The final upload should be one ZIP containing the report PDF, `predictions.csv`, the frozen inference artefacts and the repository source/reproducibility material. Do not substitute either of the older UK/topology output files or upload a separately generated prediction CSV.
